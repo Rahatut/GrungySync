@@ -1,0 +1,259 @@
+.home-container {
+  min-height: 100vh;
+  background-color: #0f0f0f;
+  color: #e0e0e0;
+  padding: 20px;
+}
+
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 900px;
+  margin: 0 auto 40px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #d4a574;
+}
+
+.home-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  color: #d4a574;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.nav-button {
+  padding: 10px 20px;
+  background-color: #d4a574;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.nav-button:hover {
+  background-color: #e0c090;
+  transform: translateY(-2px);
+}
+
+.home-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.post-form-container {
+  background-color: #1a1a1a;
+  border: 2px solid #d4a574;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.post-form-container h2 {
+  font-family: 'Playfair Display', serif;
+  color: #d4a574;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.post-input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.post-input {
+  flex: 1;
+  padding: 12px;
+  background-color: #0f0f0f;
+  border: 1px solid #d4a574;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: 'Poppins', sans-serif;
+  resize: none;
+  height: 60px;
+}
+
+.post-input:focus {
+  outline: none;
+  border-color: #e0c090;
+  box-shadow: 0 0 8px rgba(212, 165, 116, 0.3);
+}
+
+.post-submit-btn {
+  padding: 12px 25px;
+  background-color: #d4a574;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+}
+
+.post-submit-btn:hover {
+  background-color: #e0c090;
+  transform: translateY(-2px);
+}
+
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.post-card {
+  background-color: #1a1a1a;
+  border: 2px solid #d4a574;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.post-card:hover {
+  box-shadow: 0 10px 30px rgba(212, 165, 116, 0.2);
+  transform: translateY(-5px);
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 15px;
+}
+
+.post-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #d4a574;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a1a1a;
+  font-weight: bold;
+}
+
+.post-author-info h3 {
+  font-family: 'Playfair Display', serif;
+  color: #d4a574;
+  margin-bottom: 3px;
+  font-size: 1.1rem;
+}
+
+.post-author-info p {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.post-delete-btn {
+  background-color: #ff6b6b;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.post-delete-btn:hover {
+  background-color: #ff5252;
+}
+
+.post-content {
+  margin-bottom: 15px;
+  line-height: 1.6;
+  color: #e0e0e0;
+}
+
+.post-footer {
+  display: flex;
+  gap: 20px;
+  border-top: 1px solid #333;
+  padding-top: 15px;
+}
+
+.post-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #d4a574;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.post-action:hover {
+  color: #e0c090;
+  transform: scale(1.05);
+}
+
+.post-action.reacted {
+  color: #ff6b6b;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 40px;
+  color: #d4a574;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+}
+
+.empty-state h2 {
+  font-family: 'Playfair Display', serif;
+  color: #d4a574;
+  margin-bottom: 10px;
+  font-size: 1.8rem;
+}
+
+@media (max-width: 700px) {
+  .home-header {
+    flex-direction: column;
+    align-items: start;
+    gap: 15px;
+  }
+
+  .home-header h1 {
+    font-size: 2rem;
+  }
+
+  .nav-buttons {
+    width: 100%;
+  }
+
+  .nav-button {
+    flex: 1;
+    text-align: center;
+  }
+
+  .post-input-group {
+    flex-direction: column;
+  }
+
+  .post-input {
+    height: 80px;
+  }
+}

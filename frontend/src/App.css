@@ -1,0 +1,16 @@
+.app-container {
+  min-height: 100vh;
+  background-color: #0f0f0f;
+  color: #e0e0e0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 1.5rem;
+  font-family: 'Playfair Display', serif;
+  color: #d4a574;
+}

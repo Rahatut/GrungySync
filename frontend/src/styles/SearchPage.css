@@ -1,0 +1,269 @@
+.search-container {
+  min-height: 100vh;
+  background-color: #0f0f0f;
+  color: #e0e0e0;
+  padding: 20px;
+}
+
+.search-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 900px;
+  margin: 0 auto 40px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #d4a574;
+}
+
+.search-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  color: #d4a574;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.nav-button {
+  padding: 10px 20px;
+  background-color: #d4a574;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.nav-button:hover {
+  background-color: #e0c090;
+  transform: translateY(-2px);
+}
+
+.search-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.search-form-container {
+  background-color: #1a1a1a;
+  border: 2px solid #d4a574;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 40px;
+}
+
+.search-form-container h2 {
+  font-family: 'Playfair Display', serif;
+  color: #d4a574;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.search-input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 12px;
+  background-color: #0f0f0f;
+  border: 1px solid #d4a574;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #e0c090;
+  box-shadow: 0 0 8px rgba(212, 165, 116, 0.3);
+}
+
+.search-button {
+  padding: 12px 30px;
+  background-color: #d4a574;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+}
+
+.search-button:hover {
+  background-color: #e0c090;
+  transform: translateY(-2px);
+}
+
+.search-button:disabled {
+  background-color: #888;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.error-message {
+  color: #ff6b6b;
+  margin-top: 15px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.search-results {
+  margin-top: 40px;
+}
+
+.users-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.user-card {
+  background-color: #1a1a1a;
+  border: 2px solid #d4a574;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-card:hover {
+  box-shadow: 0 10px 30px rgba(212, 165, 116, 0.2);
+  transform: translateY(-5px);
+}
+
+.user-header {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #d4a574;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a1a1a;
+  font-weight: bold;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.user-info h3 {
+  font-family: 'Playfair Display', serif;
+  color: #d4a574;
+  margin-bottom: 5px;
+  font-size: 1.2rem;
+}
+
+.user-bio {
+  color: #999;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.user-stats {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding: 15px 0;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+  flex-grow: 1;
+}
+
+.stat {
+  text-align: center;
+  flex: 1;
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.5rem;
+  color: #d4a574;
+  font-weight: bold;
+}
+
+.stat-label {
+  display: block;
+  color: #888;
+  font-size: 0.85rem;
+  margin-top: 5px;
+}
+
+.view-profile-btn {
+  padding: 10px;
+  background-color: #d4a574;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+}
+
+.view-profile-btn:hover {
+  background-color: #e0c090;
+  transform: translateY(-2px);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+}
+
+.empty-state h2 {
+  font-family: 'Playfair Display', serif;
+  color: #d4a574;
+  margin-bottom: 10px;
+  font-size: 1.8rem;
+}
+
+@media (max-width: 700px) {
+  .search-header {
+    flex-direction: column;
+    align-items: start;
+    gap: 15px;
+  }
+
+  .search-header h1 {
+    font-size: 2rem;
+  }
+
+  .nav-buttons {
+    width: 100%;
+  }
+
+  .nav-button {
+    flex: 1;
+    text-align: center;
+  }
+
+  .search-input-group {
+    flex-direction: column;
+  }
+
+  .search-button {
+    width: 100%;
+  }
+
+  .users-list {
+    grid-template-columns: 1fr;
+  }
+}
