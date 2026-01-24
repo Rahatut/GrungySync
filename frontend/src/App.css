@@ -1,8 +1,27 @@
+:root {
+  --bg: #0f1115;
+  --panel: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #e07b72;
+  --accent-2: #6b5edb;
+  --text: #e9ecf2;
+  --muted: #9ba3b4;
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  --radius: 14px;
+}
+
+body {
+  min-height: 100vh;
+  background: radial-gradient(circle at 20% 20%, rgba(124, 58, 237, 0.12), transparent 25%),
+    radial-gradient(circle at 80% 0%, rgba(255, 111, 97, 0.14), transparent 28%),
+    #0b0d10;
+  color: var(--text);
+  font-family: 'Poppins', sans-serif;
+}
+
 .app-container {
   min-height: 100vh;
-  background-color: #0f0f0f;
-  color: #e0e0e0;
-  font-family: 'Poppins', sans-serif;
+  color: var(--text);
 }
 
 .loading {
@@ -12,5 +31,74 @@
   min-height: 100vh;
   font-size: 1.5rem;
   font-family: 'Playfair Display', serif;
-  color: #d4a574;
+  color: var(--accent);
+}
+
+/* Global form + button styling to match moody glass aesthetic */
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+}
+
+input,
+textarea,
+select {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25);
+}
+
+.btn,
+.nav-button,
+.post-submit-btn,
+.post-delete-btn {
+  border: 1px solid var(--border);
+  background: linear-gradient(120deg, rgba(224, 123, 114, 0.92), rgba(107, 94, 219, 0.9));
+  color: #0c0e12;
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  box-shadow: 0 10px 22px rgba(107, 94, 219, 0.18);
+}
+
+.btn:hover,
+.nav-button:hover,
+.post-submit-btn:hover,
+.post-delete-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 26px rgba(0, 0, 0, 0.28);
+}
+
+.post-delete-btn {
+  background: linear-gradient(120deg, rgba(235, 115, 115, 0.9), rgba(197, 82, 82, 0.88));
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(235, 115, 115, 0.2);
+}
+
+.card,
+.panel,
+.post-card,
+.post-form-container,
+.home-container,
+.search-container,
+.profile-container,
+.login-container {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
