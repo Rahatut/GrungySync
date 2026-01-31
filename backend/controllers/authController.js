@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
+const cloudinary = require('../config/cloudinary');
+const { Readable } = require('stream');
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -102,14 +104,68 @@ exports.getProfile = async (req, res) => {
 // Update User Profile
 exports.updateProfile = async (req, res) => {
   try {
-    const { bio, avatar } = req.body;
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      { bio, avatar },
-      { new: true }
-    ).select('-password');
+    const { bio, location, website, pronouns, theme, username } = req.body;
+    const updateData = {};
 
-    res.json({ message: 'Profile updated', user });
+    // Only update fields that are provided
+    if (bio !== undefined) updateData.bio = bio;
+    if (location !== undefined) updateData.location = location;
+    if (website !== undefined) updateData.website = website;
+    if (pronouns !== undefined) updateData.pronouns = pronouns;
+    if (theme !== undefined) updateData.theme = theme;
+    
+    // Handle username update with validation
+    if (username !== undefined && username !== '') {
+      const existingUser = await User.findOne({ username, _id: { $ne: req.user.id } });
+      if (existingUser) {
+        return res.status(400).json({ message: 'Username already taken' });
+      }
+      updateData.username = username;
+    }
+
+    // Handle avatar upload
+    if (req.files && req.files.avatar) {
+      const avatarFile = req.files.avatar[0];
+      const stream = Readable.from(avatarFile.buffer);
+
+      const cloudinaryUpload = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { folder: 'grungy/avatars', resource_type: 'auto' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        stream.pipe(uploadStream);
+      });
+
+      updateData.avatar = cloudinaryUpload.secure_url;
+    }
+
+    // Handle banner upload
+    if (req.files && req.files.banner) {
+      const bannerFile = req.files.banner[0];
+      const stream = Readable.from(bannerFile.buffer);
+
+      const cloudinaryUpload = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { folder: 'grungy/banners', resource_type: 'auto' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        stream.pipe(uploadStream);
+      });
+
+      updateData.banner = cloudinaryUpload.secure_url;
+    }
+
+    const user = await User.findByIdAndUpdate(req.user.id, updateData, {
+      new: true,
+    }).select('-password');
+
+    res.json({ message: 'Profile updated successfully', user });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -140,6 +196,12 @@ exports.searchUsers = async (req, res) => {
 exports.getUserById = async (req, res) => {
   try {
     const { userId } = req.params;
+    console.log('Fetching user with ID:', userId);
+    
+    if (!userId || userId === 'undefined') {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+    
     const user = await User.findById(userId)
       .populate('followers', 'username avatar')
       .populate('following', 'username avatar')
@@ -151,6 +213,7 @@ exports.getUserById = async (req, res) => {
 
     res.json(user);
   } catch (error) {
+    console.error('getUserById error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

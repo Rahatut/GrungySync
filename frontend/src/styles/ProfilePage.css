@@ -1,24 +1,28 @@
 .profile-container {
   min-height: 100vh;
-  background-color: #0f0f0f;
-  color: #e0e0e0;
-  padding: 20px;
+  padding: 28px 18px 48px;
+  color: var(--text);
 }
 
 .profile-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 900px;
-  margin: 0 auto 40px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #d4a574;
+  gap: 14px;
+  max-width: 1100px;
+  margin: 0 auto 28px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
 }
 
 .profile-header h1 {
   font-family: 'Playfair Display', serif;
-  font-size: 2.5rem;
-  color: #d4a574;
+  font-size: 2.3rem;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.01em;
 }
 
 .header-buttons {
@@ -26,77 +30,168 @@
   gap: 10px;
 }
 
-.back-button {
-  padding: 10px 20px;
-  background-color: #d4a574;
-  color: #1a1a1a;
-  border: none;
-  border-radius: 4px;
+.back-button,
+.action-button {
+  border: 1px solid var(--border);
+  background: linear-gradient(120deg, rgba(224, 123, 114, 0.9), rgba(107, 94, 219, 0.88));
+  color: #0c0e12;
+  border-radius: 10px;
+  padding: 10px 16px;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  box-shadow: 0 10px 22px rgba(107, 94, 219, 0.18);
 }
 
-.back-button:hover {
-  background-color: #e0c090;
-  transform: translateY(-2px);
+.back-button:hover,
+.action-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 26px rgba(0, 0, 0, 0.28);
+}
+
+.action-button.secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+.action-button.secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .profile-content {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
 .profile-card {
-  background-color: #1a1a1a;
-  border: 2px solid #d4a574;
-  border-radius: 8px;
-  padding: 40px;
-  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  padding: 32px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
   text-align: center;
+}
+
+.profile-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 20% 20%, rgba(107, 94, 219, 0.15), transparent 35%),
+    radial-gradient(circle at 80% 0%, rgba(224, 123, 114, 0.16), transparent 30%);
+  z-index: 0;
+}
+
+.profile-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .profile-avatar-large {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background-color: #d4a574;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
-  margin: 0 auto 20px;
-  color: #1a1a1a;
+  font-size: 2.6rem;
+  margin: 0 auto 16px;
+  color: #0c0e12;
+  font-weight: 800;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.profile-avatar-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-banner {
+  width: calc(100% + 64px);
+  margin: -32px -32px 16px -32px;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+}
+
+.profile-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .profile-card h2 {
   font-family: 'Playfair Display', serif;
-  font-size: 2rem;
-  color: #d4a574;
-  margin-bottom: 10px;
+  font-size: 1.9rem;
+  color: var(--text);
+  margin-bottom: 6px;
 }
 
 .profile-card .email {
-  color: #888;
-  margin-bottom: 15px;
+  color: var(--muted);
+  margin-bottom: 10px;
   font-size: 0.95rem;
 }
 
 .profile-card .bio {
-  color: #c0c0c0;
-  margin-bottom: 20px;
+  color: var(--text);
+  margin-bottom: 18px;
   font-size: 1rem;
-  line-height: 1.5;
+  line-height: 1.6;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.profile-card .pronouns {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.profile-card .location,
+.profile-card .website {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.profile-card .website a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.profile-card .website a:hover {
+  color: var(--accent-2);
 }
 
 .profile-stats {
-  display: flex;
-  justify-content: space-around;
-  padding: 20px 0;
-  border-top: 1px solid #333;
-  border-bottom: 1px solid #333;
-  margin: 20px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  padding: 16px;
+  margin: 18px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .stat {
@@ -104,182 +199,263 @@
 }
 
 .stat-number {
-  font-size: 1.8rem;
-  color: #d4a574;
-  font-weight: bold;
+  font-size: 1.4rem;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
 }
 
 .stat-label {
-  color: #888;
+  color: var(--muted);
   font-size: 0.9rem;
-  margin-top: 5px;
 }
 
 .profile-actions {
   display: flex;
-  gap: 15px;
+  gap: 12px;
   justify-content: center;
-  margin-top: 20px;
-}
-
-.action-button {
-  padding: 10px 20px;
-  background-color: #d4a574;
-  color: #1a1a1a;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  font-family: 'Poppins', sans-serif;
-}
-
-.action-button:hover:not(:disabled) {
-  background-color: #e0c090;
-  transform: translateY(-2px);
-}
-
-.action-button:disabled {
-  background-color: #888;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.action-button.secondary {
-  background-color: transparent;
-  border: 2px solid #d4a574;
-  color: #d4a574;
-}
-
-.action-button.secondary:hover:not(:disabled) {
-  background-color: rgba(212, 165, 116, 0.1);
+  margin-top: 14px;
+  flex-wrap: wrap;
 }
 
 .profile-posts {
-  margin-top: 40px;
+  margin-top: 16px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  box-shadow: var(--shadow);
 }
 
 .profile-posts h3 {
   font-family: 'Playfair Display', serif;
-  font-size: 1.8rem;
-  color: #d4a574;
-  margin-bottom: 20px;
+  font-size: 1.5rem;
+  color: var(--text);
+  margin-bottom: 16px;
 }
 
 .posts-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .post-card {
-  background-color: #1a1a1a;
-  border: 2px solid #d4a574;
-  border-radius: 8px;
-  padding: 20px;
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
 }
 
 .post-card:hover {
-  box-shadow: 0 10px 30px rgba(212, 165, 116, 0.2);
-  transform: translateY(-5px);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.32);
 }
 
 .post-header {
   display: flex;
   justify-content: space-between;
-  align-items: start;
-  margin-bottom: 15px;
+  align-items: flex-start;
+  margin-bottom: 10px;
 }
 
 .post-author-info h3 {
   font-family: 'Playfair Display', serif;
-  color: #d4a574;
-  margin-bottom: 3px;
-  font-size: 1.1rem;
+  color: var(--text);
+  margin-bottom: 4px;
+  font-size: 1.05rem;
 }
 
 .post-author-info p {
-  color: #888;
-  font-size: 0.85rem;
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .post-delete-btn {
-  background-color: #ff6b6b;
-  color: white;
-  padding: 5px 10px;
+  background: linear-gradient(120deg, rgba(235, 115, 115, 0.9), rgba(197, 82, 82, 0.88));
+  color: #fff;
+  padding: 6px 12px;
   border: none;
-  border-radius: 3px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 22px rgba(235, 115, 115, 0.2);
 }
 
 .post-delete-btn:hover {
-  background-color: #ff5252;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(235, 115, 115, 0.26);
 }
 
 .post-content {
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   line-height: 1.6;
-  color: #e0e0e0;
+  color: var(--text);
 }
 
 .post-footer {
   display: flex;
-  gap: 20px;
-  border-top: 1px solid #333;
-  padding-top: 15px;
+  gap: 18px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
 }
 
 .post-action {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  color: #d4a574;
-  transition: all 0.3s ease;
-  font-weight: 600;
+  color: var(--accent);
+  transition: transform 0.15s ease, color 0.15s ease;
+  font-weight: 700;
 }
 
 .post-action:hover {
-  color: #e0c090;
-  transform: scale(1.05);
+  color: var(--accent-2);
+  transform: translateY(-1px);
 }
 
 .post-action.reacted {
-  color: #ff6b6b;
+  color: #ff8b8b;
 }
 
 .loading-spinner {
   text-align: center;
   padding: 40px;
-  color: #d4a574;
+  color: var(--accent);
   font-family: 'Playfair Display', serif;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  color: #ff8b8b;
+  margin-top: 10px;
+  text-align: center;
 }
 
 .empty-state {
   text-align: center;
-  padding: 60px 20px;
-  color: #888;
+  padding: 48px 16px;
+  color: var(--muted);
 }
 
 .empty-state h2 {
   font-family: 'Playfair Display', serif;
-  color: #d4a574;
-  margin-bottom: 10px;
-  font-size: 1.8rem;
+  color: var(--text);
+  margin-bottom: 6px;
+  font-size: 1.4rem;
 }
 
-@media (max-width: 700px) {
-  .profile-card {
-    padding: 25px;
+.profile-actions-section {
+  margin-top: 16px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  box-shadow: var(--shadow);
+}
+
+.profile-actions-section h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.action-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+
+.action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.32);
+}
+
+.action-header-profile {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.action-type {
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: capitalize;
+}
+
+.hobby-space {
+  color: var(--muted);
+  font-size: 0.9rem;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+}
+
+.effort-score {
+  color: var(--accent-2);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.points {
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.action-content {
+  margin-bottom: 10px;
+  line-height: 1.5;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.action-date {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
+@media (max-width: 720px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  .profile-stats {
-    flex-direction: column;
-    gap: 15px;
+  .header-buttons {
+    width: 100%;
+  }
+
+  .back-button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .profile-card,
+  .profile-posts {
+    padding: 20px;
   }
 
   .profile-actions {

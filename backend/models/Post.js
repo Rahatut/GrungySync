@@ -11,6 +11,20 @@ const postSchema = new mongoose.Schema({
     required: true,
     maxlength: 500,
   },
+  media: [
+    {
+      url: {
+        type: String,
+      },
+      type: {
+        type: String,
+        enum: ['image', 'video'],
+      },
+      public_id: {
+        type: String,
+      },
+    },
+  ],
   reactions: {
     type: Number,
     default: 0,

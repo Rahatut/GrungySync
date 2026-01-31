@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
+import HeaderBar from '../components/HeaderBar';
 import '../styles/SearchPage.css';
 
 function SearchPage({ user, onLogout }) {
@@ -32,30 +33,9 @@ function SearchPage({ user, onLogout }) {
     }
   };
 
-  const handleLogoutClick = () => {
-    onLogout();
-    navigate('/auth');
-  };
-
   return (
     <div className="search-container">
-      <div className="search-header">
-        <h1>Grungy</h1>
-        <div className="nav-buttons">
-          <button className="nav-button" onClick={() => navigate('/')}>
-            Home
-          </button>
-          <button
-            className="nav-button"
-            onClick={() => navigate(`/profile/${user.id}`)}
-          >
-            Profile
-          </button>
-          <button className="nav-button" onClick={handleLogoutClick}>
-            Logout
-          </button>
-        </div>
-      </div>
+      <HeaderBar user={user} onLogout={onLogout} hideSettingsLogout />
 
       <div className="search-content">
         <div className="search-form-container">
@@ -69,8 +49,13 @@ function SearchPage({ user, onLogout }) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <button type="submit" className="search-button" disabled={loading}>
-                {loading ? 'Searching...' : 'Search'}
+              <button type="submit" className="search-button" disabled={loading} aria-label="Search">
+              {loading ? 'Searching...' : (
+                <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+              )}
               </button>
             </div>
           </form>

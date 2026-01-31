@@ -2,6 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 const authController = require('../controllers/authController');
 const authMiddleware = require('../middleware/auth');
+const upload = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -33,7 +34,15 @@ router.post(
 router.get('/profile', authMiddleware, authController.getProfile);
 
 // Update user profile
-router.put('/profile', authMiddleware, authController.updateProfile);
+router.put(
+  '/profile',
+  authMiddleware,
+  upload.fields([
+    { name: 'avatar', maxCount: 1 },
+    { name: 'banner', maxCount: 1 },
+  ]),
+  authController.updateProfile
+);
 
 // Search users by username
 router.get('/search', authController.searchUsers);

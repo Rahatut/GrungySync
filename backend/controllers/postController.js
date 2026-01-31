@@ -1,13 +1,20 @@
 const Post = require('../models/Post');
 const User = require('../models/User');
+const cloudinary = require('../config/cloudinary');
+const { Readable } = require('stream');
 
 // Create a new post
 exports.createPost = async (req, res) => {
   try {
     const { content } = req.body;
 
-    if (!content || content.trim().length === 0) {
-      return res.status(400).json({ message: 'Post content is required' });
+    const hasContent = content && content.trim().length > 0;
+    const hasMedia = req.files && req.files.length > 0;
+
+    if (!hasContent && !hasMedia) {
+      return res
+        .status(400)
+        .json({ message: 'Add some text or attach at least one media file' });
     }
 
     const post = new Post({
@@ -15,8 +22,48 @@ exports.createPost = async (req, res) => {
       content,
     });
 
+    // Handle media uploads
+    if (req.files && req.files.length > 0) {
+      if (
+        !process.env.CLOUDINARY_CLOUD_NAME ||
+        !process.env.CLOUDINARY_API_KEY ||
+        !process.env.CLOUDINARY_API_SECRET
+      ) {
+        return res.status(500).json({
+          message: 'Cloudinary is not configured. Please set CLOUDINARY_* env vars.',
+        });
+      }
+
+      const mediaPromises = req.files.map(async (file) => {
+        const stream = Readable.from(file.buffer);
+        const isVideo = file.mimetype.startsWith('video');
+
+        return new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            {
+              folder: 'grungy/posts',
+              resource_type: isVideo ? 'video' : 'auto',
+              max_bytes: 100 * 1024 * 1024,
+            },
+            (error, result) => {
+              if (error) reject(error);
+              else
+                resolve({
+                  url: result.secure_url,
+                  type: isVideo ? 'video' : 'image',
+                  public_id: result.public_id,
+                });
+            }
+          );
+          stream.pipe(uploadStream);
+        });
+      });
+
+      post.media = await Promise.all(mediaPromises);
+    }
+
     await post.save();
-    await post.populate('author', 'username avatar');
+    await post.populate('author', 'username avatar displayName');
 
     res.status(201).json({ message: 'Post created', post });
   } catch (error) {
@@ -28,6 +75,29 @@ exports.createPost = async (req, res) => {
 exports.getAllPosts = async (req, res) => {
   try {
     const posts = await Post.find()
+      .populate('author', 'username avatar bio')
+      .populate('reactedBy', 'username')
+      .sort({ createdAt: -1 });
+
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Get feed posts: posts from users the current user follows
+exports.getFeedPosts = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('following');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (!user.following || user.following.length === 0) {
+      return res.json([]);
+    }
+
+    const posts = await Post.find({ author: { $in: user.following } })
       .populate('author', 'username avatar bio')
       .populate('reactedBy', 'username')
       .sort({ createdAt: -1 });
@@ -94,6 +164,16 @@ exports.deletePost = async (req, res) => {
       return res
         .status(403)
         .json({ message: 'Not authorized to delete this post' });
+    }
+
+    // Delete media from Cloudinary
+    if (post.media && post.media.length > 0) {
+      const deletePromises = post.media.map((media) =>
+        cloudinary.uploader.destroy(media.public_id, {
+          resource_type: media.type === 'video' ? 'video' : 'image',
+        })
+      );
+      await Promise.all(deletePromises);
     }
 
     await Post.findByIdAndDelete(postId);

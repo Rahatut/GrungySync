@@ -7,6 +7,9 @@ require('./config/passport');
 
 const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
+const hobbySpaceRoutes = require('./routes/hobbySpaceRoutes');
+const actionRoutes = require('./routes/actionRoutes');
+const progressRoutes = require('./routes/progressRoutes');
 
 const app = express();
 
@@ -21,6 +24,9 @@ app.use(passport.initialize());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/hobby-spaces', hobbySpaceRoutes);
+app.use('/api/actions', actionRoutes);
+app.use('/api/progress', progressRoutes);
 
 // Basic health check
 app.get('/api/health', (req, res) => {

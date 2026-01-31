@@ -1,45 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { authAPI, postsAPI } from '../services/api';
+import { authAPI, actionsAPI } from '../services/api';
+import HeaderBar from '../components/HeaderBar';
 import '../styles/ProfilePage.css';
+import '../styles/SettingsMenu.css';
 
 function ProfilePage({ user, onLogout }) {
   const { userId } = useParams();
   const [profileUser, setProfileUser] = useState(null);
-  const [userPosts, setUserPosts] = useState([]);
+  const [userActions, setUserActions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to log out?')) {
+      onLogout();
+      navigate('/login');
+    }
+  };
+
   useEffect(() => {
-    fetchUserProfile();
-    fetchUserPosts();
+    if (userId) {
+      loadProfileData();
+    }
   }, [userId]);
+
+  const handleProfileUpdated = () => {
+    fetchUserProfile();
+  };
+
+  const loadProfileData = async () => {
+    try {
+      setLoading(true);
+      await Promise.all([fetchUserProfile(), fetchUserActions()]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchUserProfile = async () => {
     try {
+      if (!userId) {
+        setError('No user ID provided');
+        return;
+      }
       const response = await authAPI.getUserById(userId);
       setProfileUser(response.data);
       // Check if current user is following this user
       const currentUserRes = await authAPI.getProfile();
       setIsFollowing(currentUserRes.data.following.includes(userId));
     } catch (err) {
-      setError('Failed to load profile');
-      console.error(err);
+      setError('Failed to load profile: ' + (err.response?.data?.message || err.message));
+      console.error('Profile fetch error:', err);
     }
   };
 
-  const fetchUserPosts = async () => {
+  const fetchUserActions = async () => {
     try {
-      setLoading(true);
-      const response = await postsAPI.getUserPosts(userId);
-      setUserPosts(response.data);
+      const response = await actionsAPI.getUserActions(userId);
+      setUserActions(response.data);
     } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+      console.error('Error fetching user actions:', err);
     }
   };
 
@@ -61,28 +85,6 @@ function ProfilePage({ user, onLogout }) {
     }
   };
 
-  const handleReact = async (postId) => {
-    try {
-      await postsAPI.reactPost(postId);
-      fetchUserPosts();
-    } catch (err) {
-      setError('Failed to react to post');
-      console.error(err);
-    }
-  };
-
-  const handleDeletePost = async (postId) => {
-    if (window.confirm('Are you sure you want to delete this post?')) {
-      try {
-        await postsAPI.deletePost(postId);
-        fetchUserPosts();
-      } catch (err) {
-        setError('Failed to delete post');
-        console.error(err);
-      }
-    }
-  };
-
   if (loading && !profileUser) {
     return (
       <div className="profile-container">
@@ -93,32 +95,40 @@ function ProfilePage({ user, onLogout }) {
 
   return (
     <div className="profile-container">
-      <div className="profile-header">
-        <h1>Grungy</h1>
-        <div className="header-buttons">
-          <button className="back-button" onClick={() => navigate('/')}>
-            Back to Home
-          </button>
-          <button className="back-button" onClick={() => navigate('/search')}>
-            Search
-          </button>
-        </div>
-      </div>
+      <HeaderBar user={user} onLogout={onLogout} />
 
       <div className="profile-content">
         {profileUser && (
-          <div className="profile-card">
+          <div className="profile-card" key={profileUser._id}>
+            {profileUser.banner && (
+              <div className="profile-banner">
+                <img src={profileUser.banner} alt="Banner" />
+              </div>
+            )}
             <div className="profile-avatar-large">
-              {profileUser.username.charAt(0).toUpperCase()}
+              {profileUser.avatar && !profileUser.avatar.includes('placeholder') ? (
+                <img src={profileUser.avatar} alt="Avatar" />
+              ) : (
+                profileUser.username.charAt(0).toUpperCase()
+              )}
             </div>
             <h2>{profileUser.username}</h2>
             <p className="email">{profileUser.email}</p>
             {profileUser.bio && <p className="bio">{profileUser.bio}</p>}
+            {profileUser.pronouns && <p className="pronouns">{profileUser.pronouns}</p>}
+            {profileUser.location && <p className="location">📍 {profileUser.location}</p>}
+            {profileUser.website && (
+              <p className="website">
+                <a href={profileUser.website} target="_blank" rel="noopener noreferrer">
+                  🔗 {profileUser.website}
+                </a>
+              </p>
+            )}
 
             <div className="profile-stats">
               <div className="stat">
-                <div className="stat-number">{userPosts.length}</div>
-                <div className="stat-label">Posts</div>
+                <div className="stat-number">{userActions.length}</div>
+                <div className="stat-label">Actions</div>
               </div>
               <div className="stat">
                 <div className="stat-number">{profileUser.followers?.length || 0}</div>
@@ -134,16 +144,13 @@ function ProfilePage({ user, onLogout }) {
               <div className="profile-actions">
                 <button
                   className="action-button"
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/profile/edit')}
                 >
                   Edit Profile
                 </button>
                 <button
                   className="action-button secondary"
-                  onClick={() => {
-                    onLogout();
-                    navigate('/auth');
-                  }}
+                  onClick={handleLogout}
                 >
                   Logout
                 </button>
@@ -166,45 +173,25 @@ function ProfilePage({ user, onLogout }) {
 
         {error && <div className="error-message">{error}</div>}
 
-        <div className="profile-posts">
-          <h3>Posts by {profileUser?.username}</h3>
-          {userPosts.length === 0 ? (
+        <div className="profile-actions-section">
+          <h3>Actions in Hobby Spaces</h3>
+          {userActions.length === 0 ? (
             <div className="empty-state">
-              <h2>No posts yet</h2>
-              <p>This user hasn't shared anything yet</p>
+              <h2>No actions yet</h2>
+              <p>This user hasn't created any actions yet</p>
             </div>
           ) : (
-            <div className="posts-list">
-              {userPosts.map((post) => (
-                <div key={post._id} className="post-card">
-                  <div className="post-header">
-                    <div className="post-author-info">
-                      <h3>{post.author.username}</h3>
-                      <p>{new Date(post.createdAt).toLocaleDateString()}</p>
-                    </div>
-                    {user.id === post.author._id && (
-                      <button
-                        className="post-delete-btn"
-                        onClick={() => handleDeletePost(post._id)}
-                      >
-                        Delete
-                      </button>
-                    )}
+            <div className="actions-list">
+              {userActions.map((action) => (
+                <div key={action._id} className="action-card">
+                  <div className="action-header-profile">
+                    <span className="action-type">{action.actionType}</span>
+                    <span className="hobby-space">{action.hobbySpace?.name}</span>
+                    <span className="effort-score">Effort: {action.effortScore}</span>
+                    <span className="points">{action.pointsAwarded} pts</span>
                   </div>
-
-                  <div className="post-content">{post.content}</div>
-
-                  <div className="post-footer">
-                    <div
-                      className={`post-action ${
-                        post.reactedBy.includes(user.id) ? 'reacted' : ''
-                      }`}
-                      onClick={() => handleReact(post._id)}
-                    >
-                      <span>❤️</span>
-                      <span>{post.reactions}</span>
-                    </div>
-                  </div>
+                  <p className="action-content">{action.content}</p>
+                  <p className="action-date">{new Date(action.createdAt).toLocaleDateString()}</p>
                 </div>
               ))}
             </div>

@@ -1,0 +1,305 @@
+:root {
+  --accent: #ff6b6b;
+  --accent-2: #a855f7;
+  --border: rgba(255, 255, 255, 0.15);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  --radius: 12px;
+  --bg-dark: #0a0a0a;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+}
+
+.create-hobby-space-container {
+  min-height: 100vh;
+  padding: 2.5rem 1.5rem 3rem;
+  background: linear-gradient(135deg, rgba(26, 13, 38, 0.5) 0%, rgba(13, 26, 38, 0.5) 100%);
+}
+
+.create-form-card {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.35);
+}
+
+.create-form-card h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  margin: 0 0 2rem 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-grid.two-col {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 0.85rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 4px);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.form-group textarea {
+  min-height: 120px;
+}
+
+/* Category button grid replaces native select for consistent dark styling */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.65rem;
+}
+
+.category-btn {
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 6px);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+
+.category-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.category-btn.active {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  border-color: transparent;
+  color: #0c0c0c;
+  box-shadow: 0 8px 24px rgba(255, 107, 107, 0.3);
+}
+
+.category-btn:focus-visible,
+.action-type-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.2);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--text-secondary);
+}
+
+.config-section {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 4px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.config-section h3 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.action-types-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.action-type-btn {
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 6px);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.action-type-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent);
+}
+
+.action-type-btn.active {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  color: white;
+  border-color: transparent;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.cancel-btn,
+.submit-btn {
+  flex: 1;
+  max-width: 200px;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: calc(var(--radius) - 4px);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.delete-btn {
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: calc(var(--radius) - 4px);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  color: white;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.delete-btn {
+  background: rgba(255, 107, 107, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.delete-btn:hover:not(:disabled) {
+  background: rgba(255, 107, 107, 0.2);
+  border-color: rgba(255, 107, 107, 0.5);
+  transform: translateY(-2px);
+}
+
+.delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-delete-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.error-message {
+  padding: 1rem;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: calc(var(--radius) - 4px);
+  color: var(--accent);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.helper-text {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.inline-note .helper-text {
+  margin-top: -2px;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #ff6b6b 0%, #a855f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@media (max-width: 600px) {
+  .create-form-card {
+    padding: 1.5rem;
+  }
+
+  .action-types-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

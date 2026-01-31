@@ -1,0 +1,67 @@
+/* Shared Settings panel styles */
+.settings-panel {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: var(--shadow);
+}
+
+.settings-trigger {
+  position: relative;
+  display: inline-block;
+}
+
+.settings-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 300px;
+  background: rgba(20, 22, 28, 0.95);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  padding: 8px 0;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+}
+
+.settings-item {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.settings-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.settings-item.logout {
+  color: #ff6b6b;
+}
+
+.settings-item.logout:hover {
+  background: rgba(255, 107, 107, 0.1);
+}
+
+.settings-item.logout .settings-title {
+  color: #ff6b6b;
+}
+
+.settings-item:last-child {
+  border-bottom: none;
+}
+
+.settings-title {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.settings-subtext {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-top: 4px;
+}

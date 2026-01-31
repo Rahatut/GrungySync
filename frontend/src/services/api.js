@@ -30,10 +30,18 @@ export const authAPI = {
 // Posts endpoints
 export const postsAPI = {
   getAllPosts: () => api.get('/posts'),
+  getFeed: () => api.get('/posts/feed'),
   createPost: (data) => api.post('/posts', data),
   getUserPosts: (userId) => api.get(`/posts/user/${userId}`),
   reactPost: (postId) => api.post(`/posts/${postId}/react`),
   deletePost: (postId) => api.delete(`/posts/${postId}`),
+};
+
+export const actionsAPI = {
+  getFeed: (params) => api.get('/actions/feed', { params }),
+  getUserActions: (userId) => api.get(`/actions/user/${userId}`),
+  reactAction: (actionId) => api.post(`/actions/${actionId}/react`),
+  deleteAction: (actionId) => api.delete(`/actions/${actionId}`),
 };
 
 export default api;

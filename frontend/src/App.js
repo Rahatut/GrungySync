@@ -4,6 +4,13 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import SearchPage from './pages/SearchPage';
+import ProfileEditPage from './pages/ProfileEditPage';
+import PostCreatePage from './pages/PostCreatePage';
+import ActionCreatePage from './pages/ActionCreatePage';
+import HobbySpaceListPage from './pages/HobbySpaceListPage';
+import HobbySpaceDetailPage from './pages/HobbySpaceDetailPage';
+import CreateHobbySpace from './pages/CreateHobbySpace';
+import EditHobbySpace from './pages/EditHobbySpace';
 import './App.css';
 
 function App() {
@@ -35,6 +42,15 @@ function App() {
     setIsAuthenticated(false);
   };
 
+  const handleUpdateProfile = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
+  const handlePostCreated = (post) => {
+    console.log('New post created:', post);
+  };
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
@@ -63,9 +79,65 @@ function App() {
           )}
         />
         <Route
+          path="/profile/edit"
+          element={isAuthenticated ? (
+            <ProfileEditPage user={user} onUpdateProfile={handleUpdateProfile} />
+          ) : (
+            <Navigate to="/auth" />
+          )}
+        />
+        <Route
           path="/profile/:userId"
           element={isAuthenticated ? (
             <ProfilePage user={user} onLogout={handleLogout} />
+          ) : (
+            <Navigate to="/auth" />
+          )}
+        />
+        <Route
+          path="/post/create"
+          element={isAuthenticated ? (
+            <PostCreatePage user={user} onPostCreated={handlePostCreated} />
+          ) : (
+            <Navigate to="/auth" />
+          )}
+        />
+        <Route
+          path="/hobby-spaces"
+          element={isAuthenticated ? (
+            <HobbySpaceListPage user={user} onLogout={handleLogout} />
+          ) : (
+            <Navigate to="/auth" />
+          )}
+        />
+        <Route
+          path="/hobby-space/create"
+          element={isAuthenticated ? (
+            <CreateHobbySpace user={user} />
+          ) : (
+            <Navigate to="/auth" />
+          )}
+        />
+        <Route
+          path="/hobby-space/:spaceId"
+          element={isAuthenticated ? (
+            <HobbySpaceDetailPage user={user} onLogout={handleLogout} />
+          ) : (
+            <Navigate to="/auth" />
+          )}
+        />
+        <Route
+          path="/hobby-space/:spaceId/edit"
+          element={isAuthenticated ? (
+            <EditHobbySpace user={user} />
+          ) : (
+            <Navigate to="/auth" />
+          )}
+        />
+        <Route
+          path="/action/create"
+          element={isAuthenticated ? (
+            <ActionCreatePage user={user} />
           ) : (
             <Navigate to="/auth" />
           )}
