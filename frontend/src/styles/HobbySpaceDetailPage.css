@@ -407,6 +407,31 @@
   font-size: 1rem;
 }
 
+.action-media {
+  margin-top: 1rem;
+}
+
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.5rem;
+}
+
+.media-item {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.media-item img,
+.media-item video {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: cover;
+  display: block;
+}
+
 .loading {
   display: flex;
   justify-content: center;

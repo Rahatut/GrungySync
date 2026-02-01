@@ -9,7 +9,8 @@ exports.createPost = async (req, res) => {
     const { content } = req.body;
 
     const hasContent = content && content.trim().length > 0;
-    const hasMedia = req.files && req.files.length > 0;
+    const mediaUrls = req.mediaUrls || [];
+    const hasMedia = mediaUrls.length > 0;
 
     if (!hasContent && !hasMedia) {
       return res
@@ -22,44 +23,13 @@ exports.createPost = async (req, res) => {
       content,
     });
 
-    // Handle media uploads
-    if (req.files && req.files.length > 0) {
-      if (
-        !process.env.CLOUDINARY_CLOUD_NAME ||
-        !process.env.CLOUDINARY_API_KEY ||
-        !process.env.CLOUDINARY_API_SECRET
-      ) {
-        return res.status(500).json({
-          message: 'Cloudinary is not configured. Please set CLOUDINARY_* env vars.',
-        });
-      }
-
-      const mediaPromises = req.files.map(async (file) => {
-        const stream = Readable.from(file.buffer);
-        const isVideo = file.mimetype.startsWith('video');
-
-        return new Promise((resolve, reject) => {
-          const uploadStream = cloudinary.uploader.upload_stream(
-            {
-              folder: 'grungy/posts',
-              resource_type: isVideo ? 'video' : 'auto',
-              max_bytes: 100 * 1024 * 1024,
-            },
-            (error, result) => {
-              if (error) reject(error);
-              else
-                resolve({
-                  url: result.secure_url,
-                  type: isVideo ? 'video' : 'image',
-                  public_id: result.public_id,
-                });
-            }
-          );
-          stream.pipe(uploadStream);
-        });
-      });
-
-      post.media = await Promise.all(mediaPromises);
+    // Handle media from cloudinaryUpload middleware
+    if (mediaUrls.length > 0) {
+      post.media = mediaUrls.map((url) => ({
+        url,
+        type: url.includes('/video/') ? 'video' : 'image',
+        public_id: url.split('/').slice(-2).join('/'),
+      }));
     }
 
     await post.save();

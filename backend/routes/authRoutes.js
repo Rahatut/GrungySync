@@ -2,7 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 const authController = require('../controllers/authController');
 const authMiddleware = require('../middleware/auth');
-const upload = require('../middleware/upload');
+const { upload, uploadErrorHandler } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -41,6 +41,7 @@ router.put(
     { name: 'avatar', maxCount: 1 },
     { name: 'banner', maxCount: 1 },
   ]),
+  uploadErrorHandler,
   authController.updateProfile
 );
 

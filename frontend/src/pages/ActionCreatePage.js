@@ -79,19 +79,33 @@ function ActionCreatePage({ user, onLogout }) {
 
     setLoading(true);
     try {
-      const payload = {
+      // Use FormData to send both text and files
+      const formData = new FormData();
+      formData.append('hobbySpaceId', hobbySpaceId);
+      formData.append('actionType', actionType);
+      formData.append('content', content);
+      formData.append('visibility', 'public');
+      
+      // Add media files
+      mediaFiles.forEach((file) => {
+        formData.append('media', file);
+      });
+
+      console.log('Submitting action with FormData:', {
         hobbySpaceId,
         actionType,
-        content,
+        contentLength: content.length,
         mediaCount: mediaFiles.length,
-        visibility: 'public',
-      };
+        formDataEntries: Array.from(formData.entries()).map(([k, v]) => [k, v.name || v]),
+      });
 
-      const res = await api.post('/actions', payload);
+      await api.post('/actions', formData);
 
+      console.log('Action created successfully');
       // Navigate back to space
       navigate(`/hobby-space/${hobbySpaceId}`);
     } catch (err) {
+      console.error('Error creating action:', err.response?.data || err.message);
       setError(err.response?.data?.message || 'Failed to create action');
     } finally {
       setLoading(false);

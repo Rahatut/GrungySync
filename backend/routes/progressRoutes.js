@@ -6,6 +6,9 @@ const progressController = require('../controllers/progressController');
 // Get user's progress dashboard
 router.get('/dashboard', authenticate, progressController.getProgressDashboard);
 
+// Get comprehensive points analytics
+router.get('/points-analytics', authenticate, progressController.getPointsAnalytics);
+
 // Get analytics for a hobby space
 router.get('/hobby-space/:hobbySpaceId', authenticate, progressController.getHobbySpaceAnalytics);
 
