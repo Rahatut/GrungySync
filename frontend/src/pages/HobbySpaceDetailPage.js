@@ -245,6 +245,22 @@ export default function HobbySpaceDetailPage({ user, onLogout }) {
                     <span className="points">{action.pointsAwarded} pts</span>
                   </div>
 
+                  {action.mediaUrls && action.mediaUrls.length > 0 && (
+                    <div className="action-media">
+                      <div className="media-grid">
+                        {action.mediaUrls.map((url, idx) => (
+                          <div key={idx} className="media-item">
+                            {url.includes('/video/') ? (
+                              <video src={url} controls style={{ width: '100%', borderRadius: '4px' }} />
+                            ) : (
+                              <img src={url} alt={`Action media ${idx + 1}`} style={{ width: '100%', borderRadius: '4px' }} />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {action.feedbackReceived?.length > 0 && (
                     <div className="feedback-preview">
                       <span className="feedback-count">{action.feedbackReceived.length} feedbacks</span>

@@ -200,3 +200,25 @@ exports.getHobbySpaceLeaderboard = async (req, res) => {
     res.status(500).json({ message: 'Error fetching leaderboard', error: error.message });
   }
 };
+
+/**
+ * Get comprehensive points analytics for user
+ */
+exports.getPointsAnalytics = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    console.log('Fetching points analytics for user:', userId);
+    
+    const analytics = await progressService.getPointsAnalytics(userId);
+    
+    console.log('Analytics fetched successfully:', {
+      totalPoints: analytics.totalPoints,
+      totalActions: analytics.totalActions,
+    });
+
+    res.json(analytics);
+  } catch (error) {
+    console.error('Error fetching points analytics:', error);
+    res.status(500).json({ message: 'Error fetching points analytics', error: error.message });
+  }
+};

@@ -11,6 +11,7 @@ import HobbySpaceListPage from './pages/HobbySpaceListPage';
 import HobbySpaceDetailPage from './pages/HobbySpaceDetailPage';
 import CreateHobbySpace from './pages/CreateHobbySpace';
 import EditHobbySpace from './pages/EditHobbySpace';
+import PointsAnalyticsPage from './pages/PointsAnalyticsPage';
 import './App.css';
 
 function App() {
@@ -138,6 +139,14 @@ function App() {
           path="/action/create"
           element={isAuthenticated ? (
             <ActionCreatePage user={user} />
+          ) : (
+            <Navigate to="/auth" />
+          )}
+        />
+        <Route
+          path="/points-analytics"
+          element={isAuthenticated ? (
+            <PointsAnalyticsPage user={user} onLogout={handleLogout} />
           ) : (
             <Navigate to="/auth" />
           )}

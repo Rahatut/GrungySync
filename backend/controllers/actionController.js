@@ -39,13 +39,41 @@ const calculateEffortScore = (action, config) => {
 // Create a new action
 exports.createAction = async (req, res) => {
   try {
-    const { hobbySpaceId, actionType, content, mediaCount = 0, learningPoints, challenges, visibility = 'public' } = req.body;
+    // hobbySpaceId can come from body (FormData) or params
+    let { hobbySpaceId, actionType, content, learningPoints, challenges, visibility = 'public' } = req.body;
     const userId = req.user.id;
+    const files = req.files?.media || [];
+
+    console.log('=== Create action request ===');
+    console.log('Request body:', req.body);
+    console.log('Request files object keys:', Object.keys(req.files || {}));
+    console.log('Request media files:', files.map(f => ({ name: f.originalname, size: f.size, mimetype: f.mimetype })));
+    console.log('Params:', req.params);
+    console.log('Query:', req.query);
+    console.log('Headers:', Object.keys(req.headers));
+
+    if (!hobbySpaceId) {
+      console.log('ERROR: Missing hobbySpaceId');
+      return res.status(400).json({
+        message: 'Missing hobbySpaceId',
+        receivedBody: req.body,
+        receivedParams: req.params,
+        receivedQuery: req.query,
+      });
+    }
+
+    console.log('Creating action for hobbySpace:', hobbySpaceId);
 
     // Validate HobbySpace
     const hobbySpace = await HobbySpace.findById(hobbySpaceId);
+    console.log('HobbySpace query result:', hobbySpace ? 'Found' : 'Not found');
+    
     if (!hobbySpace) {
-      return res.status(404).json({ message: 'HobbySpace not found' });
+      return res.status(404).json({
+        message: 'HobbySpace not found',
+        hobbySpaceId,
+        receivedBody: req.body,
+      });
     }
 
     // Check if user is member
@@ -60,18 +88,76 @@ exports.createAction = async (req, res) => {
 
     // Validate minimum effort
     const contentLength = content?.length || 0;
-    if (contentLength < hobbySpace.actionConfig.minEffortThreshold && mediaCount === 0) {
+    if (contentLength < hobbySpace.actionConfig.minEffortThreshold && files.length === 0) {
       return res.status(400).json({
         message: `Content must be at least ${hobbySpace.actionConfig.minEffortThreshold} characters or include media`,
       });
     }
+
+    // Upload files to Cloudinary
+    let mediaUrls = [];
+    
+    // Use mediaUrls from cloudinaryUpload middleware if available
+    if (req.mediaUrls && req.mediaUrls.length > 0) {
+      mediaUrls = req.mediaUrls;
+      console.log('[CONTROLLER] Media URLs from middleware:', mediaUrls);
+    } else if (files.length > 0) {
+      // Fallback to direct upload (shouldn't happen with new middleware)
+      const cloudinary = require('../config/cloudinary');
+      
+      for (const file of files) {
+        try {
+          console.log('Uploading file:', file.originalname, 'Size:', file.size);
+          
+          const result = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              {
+                resource_type: 'auto',
+                folder: 'grungy/actions',
+                timeout: 60000,
+              },
+              (error, result) => {
+                if (error) {
+                  console.error('Cloudinary upload error:', error);
+                  reject(error);
+                } else {
+                  console.log('Cloudinary upload success:', result.secure_url);
+                  resolve(result);
+                }
+              }
+            );
+            
+            // Handle stream errors
+            uploadStream.on('error', (err) => {
+              console.error('Upload stream error:', err);
+              reject(err);
+            });
+            
+            uploadStream.end(file.buffer);
+          });
+          
+          mediaUrls.push(result.secure_url);
+          console.log('✓ File uploaded:', result.secure_url);
+        } catch (uploadError) {
+          console.error('✗ Error uploading to Cloudinary:', uploadError.message);
+          return res.status(500).json({ 
+            message: 'Error uploading media files', 
+            error: uploadError.message,
+            file: file.originalname 
+          });
+        }
+      }
+    }
+    
+    console.log('Total media URLs to save:', mediaUrls);
 
     const action = new Action({
       user: userId,
       hobbySpace: hobbySpaceId,
       actionType,
       content,
-      mediaCount,
+      mediaCount: mediaUrls.length,
+      mediaUrls,
       learningPoints,
       challenges,
       visibility,
@@ -90,7 +176,17 @@ exports.createAction = async (req, res) => {
     const dailyPoints = dailyActions.reduce((sum, a) => sum + a.pointsAwarded, 0);
     action.pointsAwarded = Math.min(action.effortScore, hobbySpace.actionConfig.dailyPointCap - dailyPoints);
 
+    console.log('Saving action with mediaUrls:', mediaUrls);
+    console.log('Action object before save:', {
+      mediaCount: action.mediaCount,
+      mediaUrls: action.mediaUrls,
+      effortScore: action.effortScore,
+      pointsAwarded: action.pointsAwarded,
+    });
+
     await action.save();
+    console.log('✓ Action saved successfully with ID:', action._id);
+    
     await action.populate('user', 'username displayName avatar');
     await action.populate('hobbySpace', 'name slug');
 
@@ -106,6 +202,8 @@ exports.createAction = async (req, res) => {
       { new: true }
     );
 
+    console.log('✓ User points updated');
+
     // Update or create streak
     await updateStreak(userId, hobbySpaceId);
 
@@ -118,13 +216,15 @@ exports.createAction = async (req, res) => {
       action.effortScore
     );
 
+    console.log('✓ Action creation complete');
     res.status(201).json({
       message: 'Action created successfully',
       action,
       improvementMultiplier,
     });
   } catch (error) {
-    console.error(error);
+    console.error('✗ Error in createAction:', error.message);
+    console.error('Stack:', error.stack);
     res.status(500).json({ message: 'Error creating action', error: error.message });
   }
 };

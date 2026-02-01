@@ -28,6 +28,8 @@ const ActionSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    // Media URLs (for images/videos uploaded)
+    mediaUrls: [String],
     // For versioned tracking
     relatedPost: {
       type: mongoose.Schema.Types.ObjectId,

@@ -1,7 +1,8 @@
 const express = require('express');
 const postController = require('../controllers/postController');
 const authMiddleware = require('../middleware/auth');
-const upload = require('../middleware/upload');
+const { upload, uploadErrorHandler } = require('../middleware/upload');
+const cloudinaryUpload = require('../middleware/cloudinaryUpload');
 
 const router = express.Router();
 
@@ -9,7 +10,9 @@ const router = express.Router();
 router.post(
   '/',
   authMiddleware,
-  upload.array('media', 10),
+  upload.fields([{ name: 'media', maxCount: 10 }]),
+  uploadErrorHandler,
+  cloudinaryUpload,
   postController.createPost
 );
 

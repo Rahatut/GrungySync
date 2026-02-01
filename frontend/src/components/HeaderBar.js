@@ -25,6 +25,9 @@ export default function HeaderBar({ user, onLogout }) {
           <button className="nav-button" onClick={() => navigate('/search')}>
             Search
           </button>
+          <button className="nav-button" onClick={() => navigate('/points-analytics')}>
+            📊 Analytics
+          </button>
           <button className="nav-button" onClick={() => navigate(`/profile/${user.id}`)}>
             Profile
           </button>

@@ -85,6 +85,12 @@ function HomePage({ user, onLogout }) {
             </button>
             <button
               className="nav-button"
+              onClick={() => navigate('/points-analytics')}
+            >
+              📊 Analytics
+            </button>
+            <button
+              className="nav-button"
               onClick={() => navigate(`/profile/${user.id}`)}
             >
               Profile
@@ -217,6 +223,26 @@ function HomePage({ user, onLogout }) {
                         {latestAction ? (
                           <>
                             <div className="action-content">{latestAction.content}</div>
+                            
+                            {latestAction.mediaUrls && latestAction.mediaUrls.length > 0 && (
+                              <div className="action-media">
+                                <div className="media-grid">
+                                  {latestAction.mediaUrls.slice(0, 2).map((url, idx) => (
+                                    <div key={idx} className="media-item">
+                                      {url.includes('/video/') ? (
+                                        <video src={url} style={{ width: '100%', borderRadius: '4px' }} />
+                                      ) : (
+                                        <img src={url} alt={`Media ${idx + 1}`} style={{ width: '100%', borderRadius: '4px' }} />
+                                      )}
+                                    </div>
+                                  ))}
+                                  {latestAction.mediaUrls.length > 2 && (
+                                    <div className="media-more">+{latestAction.mediaUrls.length - 2} more</div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            
                             <div className="action-footer">
                               <span className="user">
                                 {latestAction.user?.username}
@@ -287,6 +313,22 @@ function HomePage({ user, onLogout }) {
                       </div>
 
                       <p className="action-content">{action.content || 'No content provided'}</p>
+
+                      {action.mediaUrls && action.mediaUrls.length > 0 && (
+                        <div className="action-media">
+                          <div className="media-grid">
+                            {action.mediaUrls.map((url, idx) => (
+                              <div key={idx} className="media-item">
+                                {url.includes('/video/') ? (
+                                  <video src={url} controls style={{ width: '100%', borderRadius: '4px' }} />
+                                ) : (
+                                  <img src={url} alt={`Media ${idx + 1}`} style={{ width: '100%', borderRadius: '4px' }} />
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       <div className="action-footer">
                         <span className="action-type">{action.actionType}</span>
