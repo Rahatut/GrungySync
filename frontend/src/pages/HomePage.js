@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import ImagePreviewModal from './ImagePreviewModal';
 import { useNavigate } from 'react-router-dom';
 import api, { actionsAPI } from '../services/api';
 import '../styles/HomePage.css';
 
 function HomePage({ user, onLogout }) {
   const [feedActions, setFeedActions] = useState([]);
+  const [previewImageUrl, setPreviewImageUrl] = useState(null);
   const [myHobbySpaces, setMyHobbySpaces] = useState([]);
   const [spaceSummaries, setSpaceSummaries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -181,7 +183,15 @@ function HomePage({ user, onLogout }) {
                                       {url.includes('/video/') ? (
                                         <video src={url} style={{ width: '100%', borderRadius: '4px' }} />
                                       ) : (
-                                        <img src={url} alt={`Media ${idx + 1}`} style={{ width: '100%', borderRadius: '4px' }} />
+                                        <img
+                                          src={url}
+                                          alt={`Media ${idx + 1}`}
+                                          style={{ width: '100%', borderRadius: '4px', cursor: 'pointer' }}
+                                          onClick={e => {
+                                            e.stopPropagation();
+                                            setPreviewImageUrl(url);
+                                          }}
+                                        />
                                       )}
                                     </div>
                                   ))}
@@ -274,7 +284,15 @@ function HomePage({ user, onLogout }) {
                                 {url.includes('/video/') ? (
                                   <video src={url} controls style={{ width: '100%', borderRadius: '4px' }} />
                                 ) : (
-                                  <img src={url} alt={`Media ${idx + 1}`} style={{ width: '100%', borderRadius: '4px' }} />
+                                  <img
+                                    src={url}
+                                    alt={`Media ${idx + 1}`}
+                                    style={{ width: '100%', borderRadius: '4px', cursor: 'pointer' }}
+                                    onClick={e => {
+                                      e.stopPropagation();
+                                      setPreviewImageUrl(url);
+                                    }}
+                                  />
                                 )}
                               </div>
                             ))}
@@ -309,6 +327,9 @@ function HomePage({ user, onLogout }) {
           </>
         )}
       </div>
+      {previewImageUrl && (
+        <ImagePreviewModal url={previewImageUrl} onClose={() => setPreviewImageUrl(null)} />
+      )}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import ImagePreviewModal from './ImagePreviewModal';
 import { useNavigate, useParams } from 'react-router-dom';
 import { authAPI, actionsAPI } from '../services/api';
 import '../styles/ProfilePage.css';
@@ -10,6 +11,7 @@ function ProfilePage({ user, onLogout }) {
   const { userId } = useParams();
   const [profileUser, setProfileUser] = useState(null);
   const [userActions, setUserActions] = useState([]);
+  const [previewImageUrl, setPreviewImageUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isFollowing, setIsFollowing] = useState(false);
@@ -194,6 +196,29 @@ function ProfilePage({ user, onLogout }) {
                     )}
                   </div>
                   <p className="action-content">{action.content}</p>
+                  {action.mediaUrls && action.mediaUrls.length > 0 && (
+                    <div className="action-media">
+                      <div className="media-grid">
+                        {action.mediaUrls.map((url, idx) => (
+                          <div key={idx} className="media-item">
+                            {url.includes('/video/') ? (
+                              <video src={url} controls style={{ width: '100%', borderRadius: '4px' }} />
+                            ) : (
+                              <img
+                                src={url}
+                                alt={`Action media ${idx + 1}`}
+                                style={{ width: '100%', borderRadius: '4px', cursor: 'pointer' }}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  setPreviewImageUrl(url);
+                                }}
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <p className="action-date">{new Date(action.createdAt).toLocaleDateString()}</p>
                 </div>
               ))}
@@ -201,6 +226,9 @@ function ProfilePage({ user, onLogout }) {
           )}
         </div>
       </div>
+      {previewImageUrl && (
+        <ImagePreviewModal url={previewImageUrl} onClose={() => setPreviewImageUrl(null)} />
+      )}
     </div>
   );
 }
