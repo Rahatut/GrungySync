@@ -12,6 +12,7 @@ import ActionCreatePage from './pages/ActionCreatePage';
 import PointsAnalyticsPage from './pages/PointsAnalyticsPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import AchievementsPage from './pages/AchievementsPage';
+import PointSystemPage from './pages/PointSystemPage';
 
 
 import FollowersListPage from './pages/FollowersListPage';
@@ -149,6 +150,7 @@ function App() {
         <Route path="/points-analytics" element={protect(<PointsAnalyticsPage user={user} onLogout={handleLogout} />)} />
         <Route path="/leaderboard" element={protect(<LeaderboardPage user={user} />)} />
         <Route path="/achievements" element={protect(<AchievementsPage />)} />
+        <Route path="/point-system" element={protect(<PointSystemPage />)} />
       </Routes>
     </Router>
   );

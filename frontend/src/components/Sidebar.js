@@ -81,6 +81,14 @@ export default function Sidebar({ user, onLogout }) {
           <span className="nav-label">Achievements</span>
         </button>
 
+        <button
+          className={`sidebar-nav-item ${isActive('/point-system') ? 'active' : ''}`}
+          onClick={() => navigate('/point-system')}
+        >
+          <span className="nav-icon">✧</span>
+          <span className="nav-label">Point System</span>
+        </button>
+
         {user && (
           <button
             className={`sidebar-nav-item ${isActive('/profile') ? 'active' : ''}`}
