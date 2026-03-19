@@ -92,6 +92,9 @@ export default function HobbySpaceListPage({ user, onLogout }) {
         </button>
       </div>
 
+      {/* Add spacing between Create Space button and search */}
+      <div style={{ height: 32 }} />
+
       <div className="hobby-space-controls">
         <input
           type="text"

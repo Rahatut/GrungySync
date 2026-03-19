@@ -210,13 +210,13 @@
 }
 
 .post-action.reacted {
-  color: #f0a8a8;
+  color: #a8d8f0;
 }
 
 .loading-spinner {
   text-align: center;
   padding: 40px;
-  color: #f0d8a8;
+  color: #a8d8f0;
   font-family: 'Playfair Display', serif;
   font-size: 1.2rem;
 }

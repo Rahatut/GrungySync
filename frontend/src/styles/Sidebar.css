@@ -64,7 +64,7 @@
 
 .sidebar-nav-item:hover {
   background: rgba(255, 255, 255, 0.05);
-  color: #e0e0e0;
+  color: #a8d8f0;
 }
 
 .sidebar-nav-item.active {
@@ -145,7 +145,7 @@
   font-family: 'Playfair Display', serif;
   font-size: 1rem;
   font-weight: 700;
-  color: #e8e8e8;
+  color: #a8d8f0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -181,7 +181,7 @@
 .sidebar-logout-btn:hover {
   background: rgba(240, 168, 168, 0.08);
   border-color: rgba(240, 168, 168, 0.45);
-  color: #f0a8a8;
+  color: #a8d8f0;
 }
 
 /* ── Responsive ── */

@@ -132,6 +132,9 @@ function HomePage({ user, onLogout }) {
 
                 {error && <div className="error-message">{error}</div>}
 
+                {/* Add spacing between Create New Space and posts */}
+                <div style={{ height: 32 }} />
+
                 {loading ? (
                   <div className="loading-spinner">Loading your spaces...</div>
                 ) : spaceSummaries.length === 0 ? (

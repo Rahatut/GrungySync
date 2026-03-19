@@ -1,5 +1,5 @@
 :root {
-  --accent: #ff6b6b;
+  --accent: #00eaff;
   --accent-2: #a855f7;
   --border: rgba(255, 255, 255, 0.15);
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -74,9 +74,9 @@
 
 .search-input:focus {
   outline: none;
-  border-color: var(--accent);
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 20px rgba(255, 107, 107, 0.2);
+  border-color: var(--accent, #a8d8f0);
+  background: rgba(168, 216, 240, 0.08);
+  box-shadow: 0 0 20px rgba(168, 216, 240, 0.18);
 }
 
 .search-input::placeholder {
@@ -133,10 +133,10 @@
 }
 
 .hobby-space-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 107, 107, 0.3);
+  background: rgba(168, 216, 240, 0.08);
+  border-color: var(--accent, #00eaff) !important;
   transform: translateY(-5px);
-  box-shadow: 0 12px 32px rgba(255, 107, 107, 0.2);
+  box-shadow: 0 12px 32px rgba(0, 234, 255, 0.18);
 }
 
 .card-header {
@@ -261,7 +261,7 @@
 
 .leave-btn {
   background: rgba(216, 168, 240, 0.1);
-  color: #d8a8f0;
+  color: #a8d8f0;
   border: 1px solid rgba(216, 168, 240, 0.3);
 }
 
