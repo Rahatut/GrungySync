@@ -15,7 +15,7 @@
 .action-create-header h1 {
   font-family: 'Playfair Display', serif;
   color: #f5f5f5;
-  font-size: 2.2rem;
+  font-size: 3rem;
   font-weight: 800;
   letter-spacing: 0.6px;
 }
@@ -141,4 +141,147 @@
   color: var(--muted);
   font-size: 0.9rem;
   margin-top: 8px;
+}
+
+.revising-context-banner {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: rgba(168, 216, 240, 0.05);
+  border: 1px solid rgba(168, 216, 240, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.banner-badge {
+  background: rgba(168, 216, 240, 0.15);
+  color: #a8d8f0;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.revising-label {
+  color: #9aa0a6;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.original-preview {
+  color: #fff;
+  font-style: italic;
+  font-size: 1.05rem;
+  margin: 4px 0 0 0;
+  opacity: 0.8;
+}
+
+/* Poll & QnA Creation Styles */
+.poll-setup, .qna-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.poll-setup label, .qna-setup label {
+  color: #a8d8f0;
+  font-weight: 700;
+  font-size: 1.1rem;
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.poll-options-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.poll-option-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.poll-option-input {
+  flex: 1;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.poll-option-input:focus {
+  border-color: rgba(168, 216, 240, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+  outline: none;
+}
+
+.remove-opt-btn {
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.remove-opt-btn:hover {
+  background: rgba(255, 107, 107, 0.2);
+  transform: scale(1.1);
+}
+
+.add-opt-btn {
+  background: rgba(168, 216, 240, 0.08);
+  border: 1px solid rgba(168, 216, 240, 0.25);
+  color: #a8d8f0;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  align-self: flex-start;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  margin-top: 0.5rem;
+}
+
+.add-opt-btn:hover {
+  background: rgba(168, 216, 240, 0.15);
+  border-color: rgba(168, 216, 240, 0.5);
+  transform: translateY(-2px);
+}
+
+.qna-question-input {
+  width: 100%;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(168, 216, 240, 0.2);
+  border-radius: 14px;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-family: 'Playfair Display', serif;
+  transition: all 0.3s;
+}
+
+.qna-question-input:focus {
+  border-color: #a8d8f0;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 20px rgba(168, 216, 240, 0.15);
+  outline: none;
 }

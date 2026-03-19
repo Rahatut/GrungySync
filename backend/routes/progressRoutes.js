@@ -21,4 +21,7 @@ router.get('/improvement-score', authenticate, progressController.getImprovement
 // Get hobby space leaderboard
 router.get('/leaderboard/:hobbySpaceId', progressController.getHobbySpaceLeaderboard);
 
+// Get variable scope leaderboard (Global, Following, etc)
+router.get('/leaderboard', authenticate, progressController.getLeaderboard);
+
 module.exports = router;

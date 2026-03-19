@@ -2,6 +2,8 @@ const Badge = require('../models/Badge');
 const User = require('../models/User');
 const Streak = require('../models/Streak');
 const Action = require('../models/Action');
+const Notification = require('../models/Notification');
+const progressService = require('./progressService');
 
 /**
  * Check and award badges based on criteria
@@ -93,6 +95,25 @@ exports.checkAndAwardBadges = async (userId, hobbySpaceId) => {
           hobbySpace: hobbySpaceId,
           earnedAt: new Date(),
         });
+
+        // Award points for badge
+        await progressService.awardPoints(
+          userId,
+          50,
+          'badge_earn',
+          `Earned badge: ${badgeTemplate.name}`,
+          null,
+          hobbySpaceId
+        );
+
+        // Create notification
+        await Notification.create({
+          recipient: userId,
+          type: 'badge_earned',
+          message: `Congratulations! You've earned the "${badgeTemplate.name}" badge in your hobby space.`,
+          relatedHobbySpace: hobbySpaceId,
+        });
+
         await user.save();
       }
     }

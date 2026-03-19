@@ -14,9 +14,23 @@ const ActionSchema = new mongoose.Schema(
     },
     actionType: {
       type: String,
-      enum: ['post', 'log', 'upload', 'reflect'],
+      enum: ['post', 'log', 'upload', 'reflect', 'poll', 'qna'],
       required: true,
     },
+    // For Polls
+    pollOptions: [
+      {
+        option: String,
+        votes: {
+          type: [mongoose.Schema.Types.ObjectId],
+          ref: 'User',
+          default: [],
+        },
+      },
+    ],
+    // For Q&A
+    question: String,
+    answer: String, // can be added by space creator or user later
     // Effort metrics
     effortScore: {
       type: Number,

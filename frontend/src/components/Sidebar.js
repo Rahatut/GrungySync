@@ -65,6 +65,22 @@ export default function Sidebar({ user, onLogout }) {
           <span className="nav-label">Analytics</span>
         </button>
 
+        <button
+          className={`sidebar-nav-item ${isActive('/leaderboard') ? 'active' : ''}`}
+          onClick={() => navigate('/leaderboard')}
+        >
+          <span className="nav-icon">▤</span>
+          <span className="nav-label">Leaderboard</span>
+        </button>
+
+        <button
+          className={`sidebar-nav-item ${isActive('/achievements') ? 'active' : ''}`}
+          onClick={() => navigate('/achievements')}
+        >
+          <span className="nav-icon">🏆</span>
+          <span className="nav-label">Achievements</span>
+        </button>
+
         {user && (
           <button
             className={`sidebar-nav-item ${isActive('/profile') ? 'active' : ''}`}

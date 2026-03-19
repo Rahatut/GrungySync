@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Action = require('../models/Action');
+const PointRecord = require('../models/PointRecord');
 const progressService = require('../services/progressService');
 const badgeService = require('../services/badgeService');
 const streakService = require('../services/streakService');
@@ -41,7 +42,10 @@ exports.getHobbySpaceAnalytics = async (req, res) => {
 
     const totalActions = actions.length;
     const totalEffort = actions.reduce((sum, a) => sum + a.effortScore, 0);
-    const totalPoints = actions.reduce((sum, a) => sum + a.pointsAwarded, 0);
+
+    // Get all points from records (includes feedback, streaks, badges in this space)
+    const records = await PointRecord.find({ user: userId, relatedHobbySpace: hobbySpaceId });
+    const totalPoints = records.reduce((sum, r) => sum + r.points, 0);
 
     // Calculate actions by type
     const actionsByType = {};
@@ -163,26 +167,44 @@ exports.getHobbySpaceLeaderboard = async (req, res) => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
+    // Group by user and calculate stats
+    const userStats = {};
+    
+    // 1. Get points and effort from Actions
     const actions = await Action.find({
       hobbySpace: hobbySpaceId,
       createdAt: { $gte: thirtyDaysAgo },
     }).populate('user', 'username displayName avatar');
 
-    // Group by user and calculate stats
-    const userStats = {};
     actions.forEach((action) => {
-      const userId = action.user._id.toString();
-      if (!userStats[userId]) {
-        userStats[userId] = {
+      if (!action.user) return;
+      const uId = action.user._id.toString();
+      if (!userStats[uId]) {
+        userStats[uId] = {
           user: action.user,
           actions: 0,
           points: 0,
           effort: 0,
         };
       }
-      userStats[userId].actions += 1;
-      userStats[userId].points += action.pointsAwarded;
-      userStats[userId].effort += action.effortScore;
+      userStats[uId].actions += 1;
+      userStats[uId].points += (action.pointsAwarded || 0);
+      userStats[uId].effort += (action.effortScore || 0);
+    });
+
+    // 2. Get additional points from PointRecords (Feedback, Streaks, Badges)
+    // Filter out 'action' and 'improvement_bonus' as they are already counted via Action.pointsAwarded
+    const records = await PointRecord.find({
+      relatedHobbySpace: hobbySpaceId,
+      createdAt: { $gte: thirtyDaysAgo },
+      type: { $nin: ['action', 'improvement_bonus'] }
+    });
+
+    records.forEach((record) => {
+      const uId = record.user.toString();
+      if (userStats[uId]) {
+        userStats[uId].points += record.points;
+      }
     });
 
     // Sort by points and return top
@@ -197,6 +219,108 @@ exports.getHobbySpaceLeaderboard = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: 'Error fetching leaderboard', error: error.message });
+  }
+};
+
+/**
+ * Get advanced variable scope leaderboard
+ */
+exports.getLeaderboard = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { scope = 'global', hobbySpaceId, timeframe = 'weekly', limit = 20 } = req.query;
+
+    const startDate = new Date();
+    if (timeframe === 'weekly') {
+      startDate.setDate(startDate.getDate() - 7);
+    } else if (timeframe === 'monthly') {
+      startDate.setDate(startDate.getDate() - 30);
+    } else {
+      startDate.setFullYear(2000); // basically all time
+    }
+
+    const matchQuery = {
+      createdAt: { $gte: startDate }
+    };
+
+    if (scope === 'hobbyspace' && hobbySpaceId) {
+      matchQuery.hobbySpace = hobbySpaceId;
+    }
+
+    if (scope === 'following') {
+      const currentUser = await User.findById(userId);
+      if (currentUser && currentUser.following) {
+        matchQuery.user = { $in: currentUser.following };
+        // Optionally include the current user to compare against them:
+        matchQuery.user.$in.push(userId);
+      }
+    }
+
+    const userStats = {};
+    
+    // 1. Get stats from Actions
+    const actionMatch = { createdAt: { $gte: startDate } };
+    if (scope === 'hobbyspace' && hobbySpaceId) actionMatch.hobbySpace = hobbySpaceId;
+    
+    if (scope === 'following') {
+      const currentUser = await User.findById(userId);
+      if (currentUser && currentUser.following) {
+        actionMatch.user = { $in: [...currentUser.following, userId] };
+      }
+    }
+
+    const actions = await Action.find(actionMatch).populate('user', 'username displayName avatar');
+
+    actions.forEach((action) => {
+      if (!action.user) return;
+      const uId = action.user._id.toString();
+      if (!userStats[uId]) {
+        userStats[uId] = {
+          user: action.user,
+          actions: 0,
+          points: 0,
+          effort: 0,
+        };
+      }
+      userStats[uId].actions += 1;
+      userStats[uId].points += (action.pointsAwarded || 0);
+      userStats[uId].effort += (action.effortScore || 0);
+    });
+
+    // 2. Get additional points from PointRecords
+    const recordsMatch = {
+      createdAt: { $gte: startDate },
+      type: { $nin: ['action', 'improvement_bonus'] }
+    };
+    if (scope === 'hobbyspace' && hobbySpaceId) recordsMatch.relatedHobbySpace = hobbySpaceId;
+    if (scope === 'following') {
+      const currentUser = await User.findById(userId);
+      if (currentUser && currentUser.following) {
+        recordsMatch.user = { $in: [...currentUser.following, userId] };
+      }
+    }
+
+    const records = await PointRecord.find(recordsMatch);
+
+    records.forEach((record) => {
+      const uId = record.user.toString();
+      if (userStats[uId]) {
+        userStats[uId].points += record.points;
+      }
+    });
+
+    const leaderboard = Object.values(userStats)
+      .sort((a, b) => b.points - a.points)
+      .slice(0, parseInt(limit));
+
+    res.json({
+      scope,
+      timeframe,
+      leaderboard,
+    });
+  } catch (error) {
+    console.error('Leaderboard Error:', error);
     res.status(500).json({ message: 'Error fetching leaderboard', error: error.message });
   }
 };

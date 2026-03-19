@@ -10,6 +10,8 @@ import ProfileEditPage from './pages/ProfileEditPage';
 import PostCreatePage from './pages/PostCreatePage';
 import ActionCreatePage from './pages/ActionCreatePage';
 import PointsAnalyticsPage from './pages/PointsAnalyticsPage';
+import LeaderboardPage from './pages/LeaderboardPage';
+import AchievementsPage from './pages/AchievementsPage';
 
 
 import FollowersListPage from './pages/FollowersListPage';
@@ -145,6 +147,8 @@ function App() {
         <Route path="/hobby-space/:spaceId/edit" element={protect(<EditHobbySpace user={user} />)} />
         <Route path="/action/create" element={protect(<ActionCreatePage user={user} />)} />
         <Route path="/points-analytics" element={protect(<PointsAnalyticsPage user={user} onLogout={handleLogout} />)} />
+        <Route path="/leaderboard" element={protect(<LeaderboardPage user={user} />)} />
+        <Route path="/achievements" element={protect(<AchievementsPage />)} />
       </Routes>
     </Router>
   );

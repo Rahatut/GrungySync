@@ -2,6 +2,7 @@ const Streak = require('../models/Streak');
 const Action = require('../models/Action');
 const HobbySpace = require('../models/HobbySpace');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 
 /**
  * Calculate or update streak for a user in a hobby space
@@ -51,12 +52,27 @@ exports.updateStreak = async (userId, hobbySpaceId, actionId = null) => {
         if (streak.graceUsedCount < streak.maxGraceAllowance) {
           // Use grace period
           streak.graceUsedCount += 1;
+          
+          await Notification.create({
+            recipient: userId,
+            type: 'streak_warning',
+            message: `⚠️ Your streak in "${hobbySpace.name}" is in danger! Using grace period now. Post soon!`,
+            relatedHobbySpace: hobbySpaceId,
+          });
         } else {
           // Streak breaks
           streak.isActive = false;
           streak.breakDate = new Date();
           streak.currentStreak = 0;
           streak.graceUsedCount = 0;
+          
+          await Notification.create({
+            recipient: userId,
+            type: 'streak_warning',
+            message: `💔 Sadly your streak in "${hobbySpace.name}" has broken. Don't worry, start fresh today!`,
+            relatedHobbySpace: hobbySpaceId,
+          });
+          
           await streak.save();
           return streak;
         }

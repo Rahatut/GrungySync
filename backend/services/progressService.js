@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const Action = require('../models/Action');
+const PointRecord = require('../models/PointRecord');
+const HobbySpace = require('../models/HobbySpace');
 
 /**
  * Calculate user's baseline (average activity frequency and effort level)
@@ -79,11 +81,50 @@ exports.calculatePersonalImprovementMultiplier = async (userId, effortScore) => 
 };
 
 /**
+ * Centralized point awarding function
+ */
+exports.awardPoints = async (userId, points, type, description, relatedAction = null, relatedHobbySpace = null) => {
+  try {
+    if (points === 0) return 0;
+
+    const user = await User.findById(userId);
+    if (!user) return 0;
+
+    // Update user total points
+    user.totalPoints = (user.totalPoints || 0) + points;
+
+    // Update hobby space specific points if applicable
+    if (relatedHobbySpace) {
+      const spaceId = relatedHobbySpace.toString();
+      const currentSpacePoints = user.pointsByHobbySpace.get(spaceId) || 0;
+      user.pointsByHobbySpace.set(spaceId, currentSpacePoints + points);
+    }
+
+    await user.save();
+
+    // Create the record for analytics
+    await PointRecord.create({
+      user: userId,
+      points,
+      type,
+      description,
+      relatedAction,
+      relatedHobbySpace,
+    });
+
+    console.log(`[PROGRESS] Awarded ${points} points to ${user.username} for ${type}`);
+    return points;
+  } catch (error) {
+    console.error('Error in awardPoints:', error);
+    return 0;
+  }
+};
+
+/**
  * Award bonus points for consistency improvement
  */
 exports.awardConsistencyBonus = async (userId, hobbySpaceId, actionCount) => {
   try {
-    const user = await User.findById(userId);
     let bonus = 0;
 
     // Weekly bonus: 10 points if 3+ actions in a week
@@ -105,6 +146,17 @@ exports.awardConsistencyBonus = async (userId, hobbySpaceId, actionCount) => {
       bonus += 50;
     }
 
+    if (bonus > 0) {
+      await this.awardPoints(
+        userId, 
+        bonus, 
+        'streak_bonus', 
+        `Consistency bonus for ${actionCount} actions`, 
+        null, 
+        hobbySpaceId
+      );
+    }
+
     return bonus;
   } catch (error) {
     console.error('Error calculating consistency bonus:', error);
@@ -120,18 +172,16 @@ exports.getUserProgressAnalytics = async (userId) => {
     const user = await User.findById(userId);
 
     const analytics = {
-      totalPoints: user.totalPoints,
-      totalActions: 0,
+      totalPoints: user.totalPoints || 0,
+      totalActions: await Action.countDocuments({ user: userId }),
       activeHobbySpaces: user.hobbySpaces.length,
       averageEffortPerAction: 0,
       baseline: user.baseline,
       badges: user.badges.length,
     };
 
-    // Calculate total actions and average effort
+    // Calculate average effort
     const actions = await Action.find({ user: userId });
-    analytics.totalActions = actions.length;
-
     if (actions.length > 0) {
       const totalEffort = actions.reduce((sum, a) => sum + a.effortScore, 0);
       analytics.averageEffortPerAction = (totalEffort / actions.length).toFixed(2);
@@ -141,6 +191,32 @@ exports.getUserProgressAnalytics = async (userId) => {
   } catch (error) {
     console.error('Error getting progress analytics:', error);
     throw error;
+  }
+};
+
+/**
+ * Backfill point records from existing actions for a user
+ */
+const backfillPointRecords = async (userId) => {
+  try {
+    const existingActions = await Action.find({ user: userId });
+    for (const action of existingActions) {
+      const exists = await PointRecord.findOne({ relatedAction: action._id, user: userId });
+      if (!exists && action.pointsAwarded > 0) {
+        await PointRecord.create({
+          user: userId,
+          points: action.pointsAwarded,
+          type: action.isRevision ? 'improvement_bonus' : 'action',
+          description: `Backfilled: ${action.actionType} in space`,
+          relatedAction: action._id,
+          relatedHobbySpace: action.hobbySpace,
+          createdAt: action.createdAt
+        });
+      }
+    }
+    console.log(`[BACKFILL] Completed for user ${userId}`);
+  } catch (err) {
+    console.error('[BACKFILL] Error:', err);
   }
 };
 
@@ -156,41 +232,42 @@ exports.getPointsAnalytics = async (userId) => {
       throw new Error('User not found');
     }
 
-    // Get all actions sorted by date
-    const actions = await Action.find({ user: userId }).sort({ createdAt: 1 });
+    // 1. Backfill if no records exist but actions do
+    const recordCount = await PointRecord.countDocuments({ user: userId });
+    if (recordCount === 0) {
+      const actionCount = await Action.countDocuments({ user: userId });
+      if (actionCount > 0) {
+        await backfillPointRecords(userId);
+      }
+    }
+
+    // Get all point records sorted by date
+    const pointRecords = await PointRecord.find({ user: userId }).sort({ createdAt: 1 });
 
     // Calculate total points
     const totalPoints = user.totalPoints || 0;
 
     // Calculate this week's points
     const weekStart = new Date();
-    weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // Start of week (Sunday)
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay()); 
     weekStart.setHours(0, 0, 0, 0);
 
-    const thisWeekActions = await Action.find({
-      user: userId,
-      createdAt: { $gte: weekStart },
-    });
-
-    const thisWeekTotal = thisWeekActions.reduce((sum, a) => sum + a.pointsAwarded, 0);
+    const thisWeekRecords = pointRecords.filter(r => r.createdAt >= weekStart);
+    const thisWeekTotal = thisWeekRecords.reduce((sum, r) => sum + r.points, 0);
 
     // Calculate this month's points and highest
     const monthStart = new Date();
     monthStart.setDate(1);
     monthStart.setHours(0, 0, 0, 0);
 
-    const thisMonthActions = await Action.find({
-      user: userId,
-      createdAt: { $gte: monthStart },
-    });
-
-    const thisMonthTotal = thisMonthActions.reduce((sum, a) => sum + a.pointsAwarded, 0);
+    const thisMonthRecords = pointRecords.filter(r => r.createdAt >= monthStart);
+    const thisMonthTotal = thisMonthRecords.reduce((sum, r) => sum + r.points, 0);
 
     // Calculate highest day this month
     const dailyPointsThisMonth = {};
-    thisMonthActions.forEach((action) => {
-      const dateKey = action.createdAt.toISOString().split('T')[0];
-      dailyPointsThisMonth[dateKey] = (dailyPointsThisMonth[dateKey] || 0) + action.pointsAwarded;
+    thisMonthRecords.forEach((record) => {
+      const dateKey = record.createdAt.toISOString().split('T')[0];
+      dailyPointsThisMonth[dateKey] = (dailyPointsThisMonth[dateKey] || 0) + record.points;
     });
 
     const highestDayThisMonth = Math.max(...Object.values(dailyPointsThisMonth), 0);
@@ -202,29 +279,20 @@ exports.getPointsAnalytics = async (userId) => {
     let currentStreak = 0;
     let checkDate = new Date(today);
 
-    // Get last 365 days of actions grouped by date
-    const yearAgo = new Date();
-    yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-
-    const recentActions = await Action.find({
-      user: userId,
-      createdAt: { $gte: yearAgo },
-    });
-
-    // Group actions by date
-    const actionsByDate = {};
-    recentActions.forEach((action) => {
-      const dateKey = action.createdAt.toISOString().split('T')[0];
-      if (!actionsByDate[dateKey]) {
-        actionsByDate[dateKey] = [];
+    // Group records by date
+    const recordsByDate = {};
+    pointRecords.forEach((record) => {
+      const dateKey = record.createdAt.toISOString().split('T')[0];
+      if (!recordsByDate[dateKey]) {
+        recordsByDate[dateKey] = [];
       }
-      actionsByDate[dateKey].push(action);
+      recordsByDate[dateKey].push(record);
     });
 
     // Calculate current streak
     while (true) {
       const dateKey = checkDate.toISOString().split('T')[0];
-      if (actionsByDate[dateKey] && actionsByDate[dateKey].length > 0) {
+      if (recordsByDate[dateKey] && recordsByDate[dateKey].length > 0) {
         currentStreak++;
         checkDate.setDate(checkDate.getDate() - 1);
       } else {
@@ -237,55 +305,62 @@ exports.getPointsAnalytics = async (userId) => {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     thirtyDaysAgo.setHours(0, 0, 0, 0);
 
-    const last30DaysActions = await Action.find({
-      user: userId,
-      createdAt: { $gte: thirtyDaysAgo },
-    });
-
-    const dailyPoints = {};
+    const dailyPointsMap = {};
     // Initialize all days with 0
     for (let i = 0; i < 30; i++) {
       const date = new Date(thirtyDaysAgo);
       date.setDate(date.getDate() + i);
       const dateKey = date.toISOString().split('T')[0];
-      dailyPoints[dateKey] = 0;
+      dailyPointsMap[dateKey] = 0;
     }
 
     // Fill in actual points
-    last30DaysActions.forEach((action) => {
-      const dateKey = action.createdAt.toISOString().split('T')[0];
-      if (dailyPoints[dateKey] !== undefined) {
-        dailyPoints[dateKey] += action.pointsAwarded;
+    pointRecords.forEach((record) => {
+      const dateKey = record.createdAt.toISOString().split('T')[0];
+      if (dailyPointsMap[dateKey] !== undefined) {
+        dailyPointsMap[dateKey] += record.points;
       }
     });
 
     // Convert to array format
-    const pointsOverTime = Object.keys(dailyPoints)
+    const pointsOverTime = Object.keys(dailyPointsMap)
       .sort()
       .map((date) => ({
         date,
-        points: dailyPoints[date],
+        points: dailyPointsMap[date],
       }));
 
     // Calculate points by hobby space
     const pointsByHobbySpace = {};
-    actions.forEach((action) => {
-      if (action.hobbySpace) {
-        const spaceId = action.hobbySpace.toString();
-        pointsByHobbySpace[spaceId] = (pointsByHobbySpace[spaceId] || 0) + action.pointsAwarded;
+    const pointsByTypeBreakdown = {};
+    
+    pointRecords.forEach((record) => {
+      // By hobby space
+      if (record.relatedHobbySpace) {
+        const spaceId = record.relatedHobbySpace.toString();
+        pointsByHobbySpace[spaceId] = (pointsByHobbySpace[spaceId] || 0) + record.points;
       }
+
+      // By type
+      pointsByTypeBreakdown[record.type] = (pointsByTypeBreakdown[record.type] || 0) + record.points;
     });
 
     // Get hobby space details
-    const HobbySpace = require('../models/HobbySpace');
     const hobbySpaceBreakdown = await Promise.all(
       Object.keys(pointsByHobbySpace).map(async (spaceId) => {
-        const space = await HobbySpace.findById(spaceId);
-        return {
-          hobbySpaceId: spaceId,
-          hobbySpaceName: space ? space.name : 'Unknown',
-          points: pointsByHobbySpace[spaceId],
-        };
+        try {
+          if (!spaceId || spaceId === 'undefined' || spaceId === 'null') {
+            return { hobbySpaceId: spaceId, hobbySpaceName: 'Other/Bonus', points: pointsByHobbySpace[spaceId] };
+          }
+          const space = await HobbySpace.findById(spaceId);
+          return {
+            hobbySpaceId: spaceId,
+            hobbySpaceName: space ? space.name : 'Unknown Space',
+            points: pointsByHobbySpace[spaceId],
+          };
+        } catch (e) {
+          return { hobbySpaceId: spaceId, hobbySpaceName: 'Other/Bonus', points: pointsByHobbySpace[spaceId] };
+        }
       })
     );
 
@@ -307,8 +382,9 @@ exports.getPointsAnalytics = async (userId) => {
       currentStreak,
       pointsOverTime,
       hobbySpaceBreakdown: hobbySpaceBreakdown.sort((a, b) => b.points - a.points),
-      totalActions: actions.length,
-      averagePointsPerAction: actions.length > 0 ? (totalPoints / actions.length).toFixed(2) : 0,
+      pointsByType: pointsByTypeBreakdown,
+      totalActions: pointRecords.filter(r => r.type === 'action').length,
+      averagePointsPerAction: (totalPoints / (pointRecords.filter(r => r.type === 'action').length || 1)).toFixed(1),
       recentActionsWithMedia,
     };
   } catch (error) {

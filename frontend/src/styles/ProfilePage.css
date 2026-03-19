@@ -5,7 +5,7 @@
 }
 .stat.clickable:hover .stat-number,
 .stat.clickable:hover .stat-label {
-  color: #00eaff;
+  color: #ffffff;
 }
 
 /* Modal styles (reuse from SearchPage) */
@@ -110,22 +110,14 @@
   position: relative;
   overflow: hidden;
   padding: 48px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   text-align: center;
 }
 
-.profile-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle at 20% 20%, rgba(107, 94, 219, 0.15), transparent 35%),
-    radial-gradient(circle at 80% 0%, rgba(224, 123, 114, 0.16), transparent 30%);
-  z-index: 0;
-}
+
 
 .profile-card > * {
   position: relative;
@@ -464,6 +456,18 @@
   color: #b0b0b0;
   font-size: 0.85rem;
   margin-top: 8px;
+}
+
+.revision-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(216, 168, 240, 0.1);
+  color: #d8a8f0;
+  border: 1px solid rgba(216, 168, 240, 0.3);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 @media (max-width: 720px) {

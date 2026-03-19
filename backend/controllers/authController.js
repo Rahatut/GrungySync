@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const cloudinary = require('../config/cloudinary');
@@ -8,6 +9,24 @@ const fs = require('fs');
 // Generate JWT Token
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+};
+
+// Refill feedback tokens weekly
+const checkRefillTokens = async (user) => {
+  const now = new Date();
+  const lastRefill = user.feedbackTokens?.lastRefillDate || user.createdAt;
+  const daysSinceRefill = Math.floor((now - new Date(lastRefill)) / (1000 * 60 * 60 * 24));
+
+  if (daysSinceRefill >= 7 || !user.feedbackTokens?.lastRefillDate) {
+    user.feedbackTokens = {
+      current: 5,
+      maxPerWeek: 5,
+      lastRefillDate: now
+    };
+    await user.save();
+    return true;
+  }
+  return false;
 };
 
 // Sign Up
@@ -29,7 +48,16 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    user = new User({ username, email, password });
+    user = new User({ 
+      username, 
+      email, 
+      password,
+      feedbackTokens: {
+        current: 5,
+        maxPerWeek: 5,
+        lastRefillDate: new Date()
+      }
+    });
     await user.save();
 
     const token = generateToken(user._id);
@@ -66,6 +94,9 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    // Check for weekly token refill
+    await checkRefillTokens(user);
 
     const token = generateToken(user._id);
     res.json({
@@ -276,6 +307,14 @@ exports.followUser = async (req, res) => {
 
     await currentUser.save();
     await userToFollow.save();
+
+    // Create notification
+    await Notification.create({
+      recipient: userToFollow._id,
+      sender: currentUser._id,
+      type: 'follow',
+      message: `${currentUser.username} started following you.`,
+    });
 
     res.json({ message: 'User followed successfully' });
   } catch (error) {

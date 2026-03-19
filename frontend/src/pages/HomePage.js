@@ -125,7 +125,12 @@ function HomePage({ user, onLogout }) {
                   onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigate('/hobby-space/create')}
                 >
                   <div className="cta-text">
-                    <h2>✨ Create New Space</h2>
+                    <h2 style={{ display: 'flex', alignItems: 'center' }}>
+                      <span className="create-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                      </span>
+                      Create New Space
+                    </h2>
                     <p>Start a new community around a hobby you're passionate about</p>
                   </div>
                 </div>
@@ -234,6 +239,9 @@ function HomePage({ user, onLogout }) {
                         </button>
                         <div className="action-header-right">
                           <span className="effort-score">Effort: {Math.round(action.effortScore || 0)}</span>
+                          {action.isRevision && (
+                            <span className="revision-tag">Revision</span>
+                          )}
                           {hobbySpace && (
                             <span
                               className="space-name"

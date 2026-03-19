@@ -189,6 +189,9 @@ function ProfilePage({ user, onLogout }) {
                     <span className="hobby-space">{action.hobbySpace?.name}</span>
                     <span className="effort-score">Effort: {action.effortScore}</span>
                     <span className="points">{action.pointsAwarded} pts</span>
+                    {action.isRevision && (
+                      <span className="revision-tag" style={{ marginLeft: '8px' }}>Revision</span>
+                    )}
                   </div>
                   <p className="action-content">{action.content}</p>
                   <p className="action-date">{new Date(action.createdAt).toLocaleDateString()}</p>

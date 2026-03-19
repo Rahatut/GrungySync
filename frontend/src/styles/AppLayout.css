@@ -11,3 +11,11 @@
   min-width: 0; /* prevent flex overflow */
   overflow-x: hidden;
 }
+
+.app-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem 2rem;
+  background: transparent;
+  width: 100%;
+}

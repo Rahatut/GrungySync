@@ -10,6 +10,7 @@ const postRoutes = require('./routes/postRoutes');
 const hobbySpaceRoutes = require('./routes/hobbySpaceRoutes');
 const actionRoutes = require('./routes/actionRoutes');
 const progressRoutes = require('./routes/progressRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/hobby-spaces', hobbySpaceRoutes);
 app.use('/api/actions', actionRoutes);
 app.use('/api/progress', progressRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Basic health check
 app.get('/api/health', (req, res) => {

@@ -42,6 +42,8 @@ export const actionsAPI = {
   getUserActions: (userId) => api.get(`/actions/user/${userId}`),
   reactAction: (actionId) => api.post(`/actions/${actionId}/react`),
   deleteAction: (actionId) => api.delete(`/actions/${actionId}`),
+  giveFeedback: (actionId, feedback) => api.post(`/actions/${actionId}/feedback`, { feedback }),
+  voteInPoll: (actionId, optionIndex) => api.post(`/actions/${actionId}/vote`, { optionIndex }),
 };
 
 export default api;

@@ -1,0 +1,248 @@
+.achievements-page {
+  --accent: #a8d8f0;
+  --accent-glow: rgba(168, 216, 240, 0.4);
+  --warning: #ffcc00;
+  --warning-glow: rgba(255, 204, 0, 0.4);
+  --danger: #ff4b4b;
+  --bg-alpha: rgba(255, 255, 255, 0.03);
+  --border-alpha: rgba(255, 255, 255, 0.1);
+  --radius-lg: 16px;
+  
+  min-height: 100vh;
+  padding: 32px 40px;
+  color: var(--text-primary, #ffffff);
+  background: #0a0a0a;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.achievements-header {
+  margin-bottom: 2rem;
+}
+
+.achievements-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  color: #ffffff;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: 0.6px;
+}
+
+.achievements-header p {
+  color: #9aa0a6;
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+/* Section Styling */
+.achievements-section {
+  margin-bottom: 4rem;
+}
+
+.achievements-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: #ffffff;
+  margin: 0 0 1.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Streak Cards */
+.streaks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.streak-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.streak-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
+.streak-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.space-info h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.space-info span {
+  font-size: 0.9rem;
+  color: #9aa0a6;
+}
+
+.streak-counter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--accent);
+  font-family: 'Playfair Display', serif;
+}
+
+.fire-icon {
+  animation: flicker 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes flicker {
+  0% { transform: scale(1); filter: drop-shadow(0 0 5px var(--accent-glow)); }
+  100% { transform: scale(1.15); filter: drop-shadow(0 0 15px var(--accent-glow)); }
+}
+
+.streak-status {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.status-label {
+  color: #9aa0a6;
+  font-weight: 600;
+}
+
+.status-value {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Grace Period Warning */
+.streak-card.in-grace {
+  border-color: var(--warning);
+  background: rgba(255, 204, 0, 0.02);
+}
+
+.streak-card.in-grace .streak-counter {
+  color: var(--warning);
+}
+
+.grace-warning {
+  background: rgba(255, 204, 0, 0.15);
+  color: var(--warning);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  border: 1px solid var(--warning-glow);
+}
+
+/* Badge Cards */
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.badge-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.badge-card:hover {
+  transform: rotate(2deg) scale(1.05);
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.badge-icon {
+  font-size: 2.5rem;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 0.25rem;
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.badge-card:hover .badge-icon {
+  transform: rotateY(360deg);
+  border-color: var(--accent);
+}
+
+.badge-info h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.badge-info p {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9rem;
+  color: #9aa0a6;
+  line-height: 1.4;
+}
+
+.badge-space {
+  font-size: 0.75rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 800;
+}
+
+.badge-date {
+  font-size: 0.7rem;
+  color: #5a5f64;
+  margin-top: 4px;
+}
+
+/* Empty States */
+.empty-achievements {
+  padding: 4rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--border-alpha);
+  border-radius: var(--radius-lg);
+  color: #6c757d;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .achievements-header h1 {
+    font-size: 2.22rem;
+  }
+}
