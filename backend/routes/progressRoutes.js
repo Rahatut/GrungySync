@@ -1,7 +1,10 @@
+
 const express = require('express');
 const router = express.Router();
 const { authenticate } = require('../middleware/auth');
 const progressController = require('../controllers/progressController');
+// Get total community points
+router.get('/community/total-points', progressController.getTotalCommunityPoints);
 
 // Get user's progress dashboard
 router.get('/dashboard', authenticate, progressController.getProgressDashboard);

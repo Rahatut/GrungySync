@@ -244,23 +244,38 @@ exports.getPointsAnalytics = async (userId) => {
     // Get all point records sorted by date
     const pointRecords = await PointRecord.find({ user: userId }).sort({ createdAt: 1 });
 
+
+    // Exclude points from deleted actions (for action-type point records)
+    // Find all relatedAction IDs from pointRecords
+    const actionPointRecords = pointRecords.filter(r => r.type === 'action' && r.relatedAction);
+    const relatedActionIds = actionPointRecords.map(r => r.relatedAction);
+    // Find which relatedAction IDs still exist
+    const existingActions = await Action.find({ _id: { $in: relatedActionIds } }).select('_id');
+    const existingActionIds = new Set(existingActions.map(a => a._id.toString()));
+    // Only count point records whose relatedAction still exists
+    const validActionPointRecords = actionPointRecords.filter(r => existingActionIds.has(r.relatedAction.toString()));
+
+    // For non-action point records, always include
+    const nonActionPointRecords = pointRecords.filter(r => r.type !== 'action');
+
+    // For all analytics, use only valid action point records + non-action point records
+    const validPointRecords = [...validActionPointRecords, ...nonActionPointRecords];
+
     // Calculate total points
-    const totalPoints = user.totalPoints || 0;
+    const totalPoints = validPointRecords.reduce((sum, r) => sum + r.points, 0);
 
     // Calculate this week's points
     const weekStart = new Date();
     weekStart.setDate(weekStart.getDate() - weekStart.getDay()); 
     weekStart.setHours(0, 0, 0, 0);
-
-    const thisWeekRecords = pointRecords.filter(r => r.createdAt >= weekStart);
+    const thisWeekRecords = validPointRecords.filter(r => r.createdAt >= weekStart);
     const thisWeekTotal = thisWeekRecords.reduce((sum, r) => sum + r.points, 0);
 
     // Calculate this month's points and highest
     const monthStart = new Date();
     monthStart.setDate(1);
     monthStart.setHours(0, 0, 0, 0);
-
-    const thisMonthRecords = pointRecords.filter(r => r.createdAt >= monthStart);
+    const thisMonthRecords = validPointRecords.filter(r => r.createdAt >= monthStart);
     const thisMonthTotal = thisMonthRecords.reduce((sum, r) => sum + r.points, 0);
 
     // Calculate highest day this month
@@ -269,8 +284,8 @@ exports.getPointsAnalytics = async (userId) => {
       const dateKey = record.createdAt.toISOString().split('T')[0];
       dailyPointsThisMonth[dateKey] = (dailyPointsThisMonth[dateKey] || 0) + record.points;
     });
-
     const highestDayThisMonth = Math.max(...Object.values(dailyPointsThisMonth), 0);
+
 
     // Calculate point streak (consecutive days with points)
     const today = new Date();
@@ -281,7 +296,7 @@ exports.getPointsAnalytics = async (userId) => {
 
     // Group records by date
     const recordsByDate = {};
-    pointRecords.forEach((record) => {
+    validPointRecords.forEach((record) => {
       const dateKey = record.createdAt.toISOString().split('T')[0];
       if (!recordsByDate[dateKey]) {
         recordsByDate[dateKey] = [];
@@ -300,6 +315,7 @@ exports.getPointsAnalytics = async (userId) => {
       }
     }
 
+
     // Calculate points over time for last 30 days
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -315,7 +331,7 @@ exports.getPointsAnalytics = async (userId) => {
     }
 
     // Fill in actual points
-    pointRecords.forEach((record) => {
+    validPointRecords.forEach((record) => {
       const dateKey = record.createdAt.toISOString().split('T')[0];
       if (dailyPointsMap[dateKey] !== undefined) {
         dailyPointsMap[dateKey] += record.points;
@@ -334,7 +350,8 @@ exports.getPointsAnalytics = async (userId) => {
     const pointsByHobbySpace = {};
     const pointsByTypeBreakdown = {};
     
-    pointRecords.forEach((record) => {
+
+    validPointRecords.forEach((record) => {
       // By hobby space
       if (record.relatedHobbySpace) {
         const spaceId = record.relatedHobbySpace.toString();
@@ -374,6 +391,9 @@ exports.getPointsAnalytics = async (userId) => {
       .select('content mediaUrls pointsAwarded createdAt hobbySpace')
       .populate('hobbySpace', 'name');
 
+    // Only count point records whose relatedAction still exists for totalActions
+    const totalActions = validPointRecords.filter(r => r.type === 'action' && r.relatedAction && existingActionIds.has(r.relatedAction.toString())).length;
+
     return {
       totalPoints,
       thisWeekTotal,
@@ -383,8 +403,8 @@ exports.getPointsAnalytics = async (userId) => {
       pointsOverTime,
       hobbySpaceBreakdown: hobbySpaceBreakdown.sort((a, b) => b.points - a.points),
       pointsByType: pointsByTypeBreakdown,
-      totalActions: pointRecords.filter(r => r.type === 'action').length,
-      averagePointsPerAction: (totalPoints / (pointRecords.filter(r => r.type === 'action').length || 1)).toFixed(1),
+      totalActions,
+      averagePointsPerAction: (totalPoints / (totalActions || 1)).toFixed(1),
       recentActionsWithMedia,
     };
   } catch (error) {

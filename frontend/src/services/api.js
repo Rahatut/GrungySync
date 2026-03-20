@@ -1,4 +1,10 @@
+
 import axios from 'axios';
+// Community analytics endpoints
+export const communityAPI = {
+  getTotalCommunityPoints: () => api.get('/progress/community/total-points'),
+  getTrendingSpaces: () => api.get('/hobby-spaces'), // Sort by memberCount in frontend
+};
 
 const API_BASE = 'http://localhost:5000/api';
 

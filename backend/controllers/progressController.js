@@ -1,3 +1,18 @@
+/**
+ * Get total community points (sum of all users' totalPoints)
+ */
+exports.getTotalCommunityPoints = async (req, res) => {
+  try {
+    const result = await User.aggregate([
+      { $group: { _id: null, totalPoints: { $sum: "$totalPoints" } } }
+    ]);
+    const totalPoints = result[0]?.totalPoints || 0;
+    res.json({ totalPoints });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching total community points', error: error.message });
+  }
+};
 const User = require('../models/User');
 const Action = require('../models/Action');
 const PointRecord = require('../models/PointRecord');
@@ -250,11 +265,15 @@ exports.getLeaderboard = async (req, res) => {
 
     if (scope === 'following') {
       const currentUser = await User.findById(userId);
-      if (currentUser && currentUser.following) {
-        matchQuery.user = { $in: currentUser.following };
-        // Optionally include the current user to compare against them:
-        matchQuery.user.$in.push(userId);
+      let followingIds = [];
+      if (currentUser && Array.isArray(currentUser.following)) {
+        followingIds = currentUser.following.map(id => id.toString());
       }
+      // Always include the current user
+      if (!followingIds.includes(userId.toString())) {
+        followingIds.push(userId.toString());
+      }
+      matchQuery.user = { $in: followingIds };
     }
 
     const userStats = {};
@@ -265,9 +284,15 @@ exports.getLeaderboard = async (req, res) => {
     
     if (scope === 'following') {
       const currentUser = await User.findById(userId);
-      if (currentUser && currentUser.following) {
-        actionMatch.user = { $in: [...currentUser.following, userId] };
+      let followingIds = [];
+      if (currentUser && Array.isArray(currentUser.following)) {
+        followingIds = currentUser.following.map(id => id.toString());
       }
+      // Always include the current user
+      if (!followingIds.includes(userId.toString())) {
+        followingIds.push(userId.toString());
+      }
+      actionMatch.user = { $in: followingIds };
     }
 
     const actions = await Action.find(actionMatch).populate('user', 'username displayName avatar');
@@ -296,9 +321,15 @@ exports.getLeaderboard = async (req, res) => {
     if (scope === 'hobbyspace' && hobbySpaceId) recordsMatch.relatedHobbySpace = hobbySpaceId;
     if (scope === 'following') {
       const currentUser = await User.findById(userId);
-      if (currentUser && currentUser.following) {
-        recordsMatch.user = { $in: [...currentUser.following, userId] };
+      let followingIds = [];
+      if (currentUser && Array.isArray(currentUser.following)) {
+        followingIds = currentUser.following.map(id => id.toString());
       }
+      // Always include the current user
+      if (!followingIds.includes(userId.toString())) {
+        followingIds.push(userId.toString());
+      }
+      recordsMatch.user = { $in: followingIds };
     }
 
     const records = await PointRecord.find(recordsMatch);

@@ -1,9 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { communityAPI } from '../services/api';
 import '../styles/LeaderboardPage.css';
 
 function LeaderboardPage({ user }) {
+    // Community stats
+    const [totalCommunityPoints, setTotalCommunityPoints] = useState(null);
+    const [trendingSpaces, setTrendingSpaces] = useState([]);
+
+    // Fetch total community points
+    useEffect(() => {
+      communityAPI.getTotalCommunityPoints()
+        .then(res => setTotalCommunityPoints(res.data.totalPoints))
+        .catch(() => setTotalCommunityPoints(null));
+    }, []);
+
+    // Fetch trending spaces (sort by memberCount desc)
+    useEffect(() => {
+      communityAPI.getTrendingSpaces()
+        .then(res => {
+          const sorted = (res.data || []).slice().sort((a, b) => (b.memberCount || 0) - (a.memberCount || 0));
+          setTrendingSpaces(sorted.slice(0, 4));
+        })
+        .catch(() => setTrendingSpaces([]));
+    }, []);
   const navigate = useNavigate();
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,25 +54,31 @@ function LeaderboardPage({ user }) {
 
   // Fetch leaderboard data when filters change
   useEffect(() => {
-    async function fetchLeaderboard() {
+    let debounceTimeout;
+    function fetchLeaderboard() {
       setLoading(true);
       setError('');
-      try {
-        let endpoint = `/progress/leaderboard?scope=${scope}&timeframe=${timeframe}`;
-        if (scope === 'hobbyspace' && selectedSpaceId) {
-          endpoint += `&hobbySpaceId=${selectedSpaceId}`;
-        }
-
-        const response = await api.get(endpoint);
-        setLeaderboard(response.data.leaderboard || []);
-      } catch (err) {
-        setError('Failed to load leaderboard data.');
-        console.error(err);
-      } finally {
-        setLoading(false);
+      let endpoint = `/progress/leaderboard?scope=${scope}&timeframe=${timeframe}`;
+      if (scope === 'hobbyspace' && selectedSpaceId) {
+        endpoint += `&hobbySpaceId=${selectedSpaceId}`;
       }
+      api.get(endpoint)
+        .then(response => {
+          setLeaderboard(response.data.leaderboard || []);
+        })
+        .catch(err => {
+          let msg = 'Failed to load leaderboard data.';
+          if (err.response && err.response.data && err.response.data.message) {
+            msg += ' ' + err.response.data.message;
+          }
+          setError(msg);
+          console.error(err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
-    
+
     // Only fetch if safe: if scope is hobbyspace, we need a selectedSpaceId
     if (scope === 'hobbyspace' && !selectedSpaceId) {
       if (mySpaces.length === 0 && !loading) {
@@ -59,14 +86,56 @@ function LeaderboardPage({ user }) {
       }
       return;
     }
-    
-    fetchLeaderboard();
+
+    debounceTimeout = setTimeout(fetchLeaderboard, 400);
+    return () => clearTimeout(debounceTimeout);
   }, [scope, timeframe, selectedSpaceId, mySpaces.length]);
 
   return (
     <div className="leaderboard-container">
       <div className="leaderboard-header">
         <h1>Leaderboard</h1>
+      </div>
+
+      {/* Community Stats Row */}
+      <div className="community-stats-row">
+        <div className="community-card total-points">
+          <div className="card-label">Total Community Points</div>
+          <div className="card-value">{totalCommunityPoints !== null ? totalCommunityPoints.toLocaleString() : '—'}</div>
+        </div>
+        {/* Daily Champion: top leaderboard entry */}
+        {leaderboard.length > 0 && (
+          <div className="community-card daily-champion">
+            <div className="card-label">Daily Champion</div>
+            <div className="champion-info">
+              <div className="champion-avatar">
+                {leaderboard[0].user?.avatar ? (
+                  <img src={leaderboard[0].user.avatar} alt="champion" />
+                ) : (
+                  leaderboard[0].user?.username ? leaderboard[0].user.username.charAt(0).toUpperCase() : '?' 
+                )}
+              </div>
+              <div>
+                <div className="champion-name">@{leaderboard[0].user?.username || 'Anonymous'}</div>
+                <div className="champion-role">{leaderboard[0].user?.displayName || ''}</div>
+                <div className="champion-points">{leaderboard[0].points || 0} pts</div>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Trending Spaces */}
+        <div className="community-card trending-spaces">
+          <div className="card-label">Trending Spaces</div>
+          <div className="trending-list">
+            {trendingSpaces.map((space, idx) => (
+              <div className="trending-space" key={space._id || idx}>
+                <span className="trending-rank">#{idx + 1}</span>
+                <span className="trending-name">{space.name}</span>
+                <span className="trending-members">{space.memberCount} members</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="leaderboard-controls">

@@ -54,16 +54,10 @@ export default function Sidebar({ user, onLogout }) {
           onClick={() => navigate('/search')}
         >
           <span className="nav-icon">⊙</span>
-          <span className="nav-label">Search</span>
+          <span className="nav-label">People</span>
         </button>
 
-        <button
-          className={`sidebar-nav-item ${isActive('/points-analytics') ? 'active' : ''}`}
-          onClick={() => navigate('/points-analytics')}
-        >
-          <span className="nav-icon">◈</span>
-          <span className="nav-label">Analytics</span>
-        </button>
+
 
         <button
           className={`sidebar-nav-item ${isActive('/leaderboard') ? 'active' : ''}`}
@@ -73,13 +67,7 @@ export default function Sidebar({ user, onLogout }) {
           <span className="nav-label">Leaderboard</span>
         </button>
 
-        <button
-          className={`sidebar-nav-item ${isActive('/achievements') ? 'active' : ''}`}
-          onClick={() => navigate('/achievements')}
-        >
-          <span className="nav-icon">🏆</span>
-          <span className="nav-label">Achievements</span>
-        </button>
+        {/* Achievements tab removed */}
 
         <button
           className={`sidebar-nav-item ${isActive('/point-system') ? 'active' : ''}`}
